@@ -1,0 +1,7 @@
+This is the first paragraph of a plain text sample document. It has no
+markup at all, just prose.
+
+This is the second paragraph. It is separated from the first by a single
+blank line, which is the only structure a plain text parser can rely on.
+
+This is the third and final paragraph.
