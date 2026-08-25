@@ -1,0 +1,46 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        exclude: package-lock.json|\.pre-commit-config\.yaml
+
+  - repo: local
+    hooks:
+      - id: dotnet-format
+        name: dotnet format (verify)
+        description: Fail if C# source is not formatted. Skips until a solution exists (docs/PLAN.md Step 1).
+        entry: scripts/hooks/dotnet-format.sh
+        language: script
+        files: \.(cs|csproj|props)$
+        pass_filenames: false
+
+      - id: dotnet-test
+        name: dotnet test
+        description: Run the unit test suite. Skips until a solution exists (docs/PLAN.md Step 1).
+        entry: scripts/hooks/dotnet-test.sh
+        language: script
+        files: \.(cs|csproj|sln)$
+        pass_filenames: false
+
+      - id: dotnet-vulnerable-packages
+        name: dotnet list package --vulnerable
+        description: Fail if a referenced NuGet package has a known vulnerability. Skips until a solution exists (docs/PLAN.md Step 1).
+        entry: scripts/hooks/dotnet-security.sh
+        language: script
+        files: \.(csproj|props|sln)$
+        pass_filenames: false

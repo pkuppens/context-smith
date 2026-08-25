@@ -53,3 +53,40 @@ Install with `winget`:
 ```bash
 winget install --id GitHub.cli
 ```
+
+## pre-commit
+
+Git hooks — formatting, tests, secret scanning, and NuGet vulnerability
+scanning — run through [pre-commit](https://pre-commit.com/). Config lives
+in `.pre-commit-config.yaml`; hook scripts live in `scripts/hooks/`.
+
+Check the installed version:
+
+```bash
+pre-commit --version
+```
+
+Install with `winget` or `pip`:
+
+```bash
+winget install --id pre-commit.pre-commit
+# or
+pip install pre-commit
+```
+
+Install the git hooks once per clone:
+
+```bash
+pre-commit install
+```
+
+Run every hook against every file — useful after cloning, or after editing
+`.pre-commit-config.yaml`:
+
+```bash
+pre-commit run --all-files
+```
+
+The `dotnet-format`, `dotnet-test`, and `dotnet-vulnerable-packages` hooks
+skip with a message until a `.sln` file exists (Step 1 in `docs/PLAN.md`).
+They activate automatically once the solution is scaffolded.
