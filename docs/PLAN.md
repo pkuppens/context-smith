@@ -581,7 +581,13 @@ Issue: [#7](https://github.com/pkuppens/context-smith/issues/7)
 Issue: [#8](https://github.com/pkuppens/context-smith/issues/8)
 
 **Goal.** Add embeddings and retrieval, with Azure AI Search as the first
-managed implementation.
+managed implementation, and a configuration switch between the Ollama
+embedding model (Step 13) and the new Azure OpenAI one, whatever their
+vector dimensions turn out to be.
+
+Sequenced after Step 15 (#16): Step 15 makes `IDocumentStore` and
+`IRetrievalService` DI-selectable, so this step's Azure AI Search
+implementation targets that shape directly.
 
 **Acceptance criteria**
 
@@ -589,6 +595,14 @@ managed implementation.
       Azure OpenAI implementation.
 - [ ] `IRetrievalService` is defined in `ContextSmith.Application`, with an
       Azure AI Search implementation for indexing and search.
+- [ ] Configuration (`IConfiguration`) selects the active
+      `IEmbeddingService` implementation — Ollama's `nomic-embed-text` from
+      Step 13, or an Azure OpenAI embedding deployment — without a code
+      change.
+- [ ] The retrieval store's vector dimension follows the selected embedding
+      model instead of being hard-coded, so `nomic-embed-text` (768) and an
+      Azure OpenAI embedding model (1024 or 1536, depending on the
+      deployment chosen) both work behind the same `IRetrievalService`.
 - [ ] Unit tests verify both interfaces against a fake implementation
       without calling Azure.
 - [ ] An optional integration test, marked as requiring Azure credentials,
@@ -613,10 +627,18 @@ managed implementation.
 - [ ] 2. Define `IEmbeddingService` and `IRetrievalService` in
       `ContextSmith.Application`.
 - [ ] 3. Implement the Azure OpenAI embedding service.
-- [ ] 4. Implement the Azure AI Search retrieval service.
-- [ ] 5. Add unit tests against fake implementations of both interfaces
+- [ ] 4. Implement the Azure AI Search retrieval service. Read the target
+      vector dimension from configuration or from the selected embedding
+      model, instead of hard-coding it, so the same index-creation code
+      works for `nomic-embed-text` (768) and Azure OpenAI embedding models
+      (1024 or 1536).
+- [ ] 5. Wire the active `IEmbeddingService` (Ollama vs. Azure OpenAI) to a
+      configuration switch in `ContextSmith.Api`/`ContextSmith.Mcp`'s
+      `ServiceCollectionExtensions`, alongside the `Storage:Provider`
+      switch from Step 15.
+- [ ] 6. Add unit tests against fake implementations of both interfaces
       (no Azure call).
-- [ ] 6. Add an integration test, skipped when Azure credentials are
+- [ ] 7. Add an integration test, skipped when Azure credentials are
       absent (same pattern as Step 5), that indexes fixture chunks and
       retrieves the top-K results for a known query.
 
@@ -797,6 +819,17 @@ MCP prompts as sample prompts.
 
 See the issue for full acceptance criteria, steps, and validation.
 
+### Step 15 — Document and embedding persistence
+
+Issue: [#16](https://github.com/pkuppens/context-smith/issues/16)
+
+**Goal.** Make `IDocumentStore` and `IRetrievalService` DI-selectable
+(in-memory, file-backed, and shaped for a future database backend), with
+idempotent overwrite, ahead of Step 8's Azure work — so Step 8 lands on the
+finished persistence shape instead of retrofitting it.
+
+See the issue for full acceptance criteria, steps, and validation.
+
 ## Status
 
 ContextSmith is under active development.
@@ -805,7 +838,7 @@ Steps 1-4, 6, 7, and 12-14 are done — a working local demo (`docs/DEMO.md`):
 upload or fetch a document (txt/md/docx/html, or any http(s) URL), parse it
 into the canonical model, chunk it, embed and index the chunks locally with
 Ollama, and ask grounded questions about it through an Angular UI, with the
-MCP server's own prompts offered as sample prompts. Steps 5, 8, 9, 10, 11
-(Azure-backed PDF, embeddings, deployment, evaluation, and additional
-Office formats) stay on the roadmap for when Azure credentials are
-available.
+MCP server's own prompts offered as sample prompts. Step 15 (DI-selectable
+persistence) is next, ahead of Steps 5, 8, 9, 10, 11 (Azure-backed PDF,
+embeddings, deployment, evaluation, and additional Office formats), which
+stay on the roadmap for when Azure credentials are available.

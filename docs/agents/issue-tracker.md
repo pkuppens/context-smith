@@ -13,6 +13,12 @@ Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all op
 
 Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
 
+## Issue body template
+
+Write every issue body using the template in [`docs/agents/issue-template.md`](./issue-template.md): `Goal`, `Acceptance Criteria`, `Steps`, `Validation`, `Out of Scope`. Use this template both when you create an issue and when you check an existing one for the expected level of detail.
+
+Use the `draft` label, and the template's placeholder syntax, for an issue opened before all details are known.
+
 ## Pull requests as a triage surface
 
 **PRs as a request surface: no.** _(Set to `yes` if this repo treats external PRs as feature requests; `/triage` reads this flag.)_
