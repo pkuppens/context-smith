@@ -2,6 +2,15 @@
 
 > From source documents to meaningful AI context.
 
+## What we're building
+
+![ContextSmith demo: a document's parsed heading outline next to a chat answer grounded in the correct source chunk](docs/images/demo-screenshot.png)
+
+Upload a document, or paste a URL. ContextSmith parses it into a structured
+outline, then answers questions about it in a chat window — grounded in
+the document's own text, with the source of every answer shown. See
+[docs/DEMO.md](docs/DEMO.md) to run it locally.
+
 ContextSmith is a C#/.NET reference implementation for document-to-context processing.
 
 ContextSmith normalizes flat text and heavily formatted documents into meaningful, hierarchically structured documents. It prepares this structure for RAG, search, and AI agents.
