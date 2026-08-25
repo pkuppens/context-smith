@@ -6,6 +6,7 @@
     <Project Path="src/ContextSmith.Documents.Text/ContextSmith.Documents.Text.csproj" />
     <Project Path="src/ContextSmith.Domain/ContextSmith.Domain.csproj" />
     <Project Path="src/ContextSmith.Mcp/ContextSmith.Mcp.csproj" />
+    <Project Path="src/ContextSmith.Retrieval.Local/ContextSmith.Retrieval.Local.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ContextSmith.Application.Tests/ContextSmith.Application.Tests.csproj" />
@@ -14,5 +15,6 @@
     <Project Path="tests/ContextSmith.Documents.Text.Tests/ContextSmith.Documents.Text.Tests.csproj" />
     <Project Path="tests/ContextSmith.Domain.Tests/ContextSmith.Domain.Tests.csproj" />
     <Project Path="tests/ContextSmith.Mcp.Tests/ContextSmith.Mcp.Tests.csproj" />
+    <Project Path="tests/ContextSmith.Retrieval.Local.Tests/ContextSmith.Retrieval.Local.Tests.csproj" />
   </Folder>
 </Solution>
