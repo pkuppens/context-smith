@@ -213,25 +213,27 @@ gitignore` template from step 7 already excludes both.
 
 Issue: [#2](https://github.com/pkuppens/context-smith/issues/2)
 
+**Status: implemented on `feature/2-canonical-document-model`, pull request
+open, awaiting review.**
+
 **Goal.** Define one document model that does not depend on a source file
 type.
 
 **Acceptance criteria**
 
-- [ ] `ContextSmith.Domain` defines types for Document, Section, Heading,
+- [x] `ContextSmith.Domain` defines types for Document, Section, Heading,
       Paragraph, List, Table, Metadata, and Provenance.
-- [ ] Each type that represents document content carries a provenance
+- [x] Each type that represents document content carries a provenance
       reference (source id and source location).
-- [ ] A unit test builds a sample tree and asserts the parent-child
+- [x] A unit test builds a sample tree and asserts the parent-child
       relations and the provenance fields.
-- [ ] `ContextSmith.Domain.csproj` still has zero `<PackageReference>`
+- [x] `ContextSmith.Domain.csproj` still has zero `<PackageReference>`
       entries after this step.
 
 **Steps**
 
-- [ ] 1. Design the domain types from `docs/ARCHITECTURE.md`'s canonical
-      model diagram. Starting sketch — adjust while implementing, this is
-      not a contract:
+- [x] 1. Design the domain types from `docs/ARCHITECTURE.md`'s canonical
+      model diagram. Implemented as sketched below, one type per file:
 
       ```csharp
       namespace ContextSmith.Domain;
@@ -281,18 +283,18 @@ type.
       }
       ```
 
-- [ ] 2. Confirm every content-bearing type carries `Provenance` — the
-      sketch above gets this for free by putting it on the shared
-      `DocumentNode` base type.
-- [ ] 3. Write a unit test in `ContextSmith.Domain.Tests` that constructs a
+- [x] 2. Confirm every content-bearing type carries `Provenance` — done via
+      the shared `DocumentNode` base type.
+- [x] 3. Write a unit test in `ContextSmith.Domain.Tests` that constructs a
       small tree (`Document` → `Section` → `Heading`/`Paragraph`) and
-      asserts the parent-child structure and the provenance fields.
+      asserts the parent-child structure and the provenance fields. See
+      `DocumentTreeTests.Document_tree_preserves_structure_and_provenance`.
 
 **Validation**
 
-- [ ] `dotnet build` succeeds.
-- [ ] `dotnet test --filter ContextSmith.Domain.Tests` passes.
-- [ ] `pre-commit run --all-files` passes.
+- [x] `dotnet build` succeeds.
+- [x] `dotnet test --filter ContextSmith.Domain.Tests` passes.
+- [x] `pre-commit run --all-files` passes.
 
 ### Step 3 — Text and Markdown
 
@@ -742,7 +744,8 @@ evaluation approach are stable.
 ContextSmith is under active development.
 
 Step 1 (repository and application foundation) is done — see the commit
-history and issue #1. The current goal is a small and testable
+history and issue #1. Step 2 (canonical document model) is implemented on a
+feature branch, pull request open. The current goal is a small and testable
 document-processing core (Steps 2-4). Later steps add chunking, MCP access,
 retrieval, Azure deployment, comparative evaluation, and additional Office
 formats.
