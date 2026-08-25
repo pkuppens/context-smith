@@ -16,6 +16,9 @@ in a controlled way.
 
 Issue: [#1](https://github.com/pkuppens/context-smith/issues/1)
 
+See [docs/PREREQUISITES.md](PREREQUISITES.md) for the required .NET SDK
+version before running any command below.
+
 **Goal.** Create a solution that builds, tests, and runs in CI.
 
 **Acceptance criteria**
