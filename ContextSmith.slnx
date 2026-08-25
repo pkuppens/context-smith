@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/ContextSmith.Application/ContextSmith.Application.csproj" />
     <Project Path="src/ContextSmith.Documents.Docx/ContextSmith.Documents.Docx.csproj" />
+    <Project Path="src/ContextSmith.Documents.Html/ContextSmith.Documents.Html.csproj" />
     <Project Path="src/ContextSmith.Documents.Text/ContextSmith.Documents.Text.csproj" />
     <Project Path="src/ContextSmith.Domain/ContextSmith.Domain.csproj" />
     <Project Path="src/ContextSmith.Mcp/ContextSmith.Mcp.csproj" />
@@ -9,6 +10,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/ContextSmith.Application.Tests/ContextSmith.Application.Tests.csproj" />
     <Project Path="tests/ContextSmith.Documents.Docx.Tests/ContextSmith.Documents.Docx.Tests.csproj" />
+    <Project Path="tests/ContextSmith.Documents.Html.Tests/ContextSmith.Documents.Html.Tests.csproj" />
     <Project Path="tests/ContextSmith.Documents.Text.Tests/ContextSmith.Documents.Text.Tests.csproj" />
     <Project Path="tests/ContextSmith.Domain.Tests/ContextSmith.Domain.Tests.csproj" />
     <Project Path="tests/ContextSmith.Mcp.Tests/ContextSmith.Mcp.Tests.csproj" />
