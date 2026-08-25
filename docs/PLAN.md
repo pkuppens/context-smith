@@ -19,148 +19,179 @@ Issue: [#1](https://github.com/pkuppens/context-smith/issues/1)
 See [docs/PREREQUISITES.md](PREREQUISITES.md) for the required .NET SDK
 version before running any command below.
 
+**Status: done.** Implemented directly on `main` (see commit history around
+2026-08-25). Kept here, fully checked off, as the reference for how later
+steps extend the solution.
+
 **Goal.** Create a solution that builds, tests, and runs in CI.
 
 **Acceptance criteria**
 
-- [ ] `dotnet build` builds the solution without error.
-- [ ] The solution has these projects: `ContextSmith.Domain`,
+- [x] `dotnet build` builds the solution without error.
+- [x] The solution has these projects: `ContextSmith.Domain`,
       `ContextSmith.Application`, `ContextSmith.Documents.Docx`,
-      `ContextSmith.Mcp`, and one test project per source project.
-- [ ] `ContextSmith.Domain` does not reference Open XML, Azure, MCP, or
+      `ContextSmith.Mcp`, and a test project for `Domain`,
+      `Documents.Docx`, and `Mcp`. `Application` gets a test project in
+      Step 6, once it has chunking logic worth testing.
+- [x] `ContextSmith.Domain` does not reference Open XML, Azure, MCP, or
       ASP.NET Core packages.
-- [ ] A GitHub Actions workflow runs build and test on push and pull
+- [x] A GitHub Actions workflow runs build and test on push and pull
       request.
-- [ ] `.editorconfig`, `Directory.Build.props`, and
+- [x] `.editorconfig`, `Directory.Build.props`, and
       `Directory.Packages.props` exist and set shared build rules and
       central package versions.
+- [x] `git status` after setup shows no `bin/` or `obj/` folder as
+      untracked.
 
 **Steps**
 
 Run these commands from the repository root. Each command creates or
 changes files on disk — nothing here talks to GitHub or Azure.
 
-1. Create the solution file.
+- [x] 1. Create the solution file.
 
-   ```bash
-   dotnet new sln -n ContextSmith
-   ```
+      ```bash
+      dotnet new sln -n ContextSmith
+      ```
 
-   This creates `ContextSmith.sln` — an empty solution, no projects yet.
+      **Lesson learned:** on the .NET 10 SDK, `dotnet new sln` creates
+      `ContextSmith.slnx` (the new XML solution format), not
+      `ContextSmith.sln`. Every `dotnet sln ...` command below targets
+      `ContextSmith.slnx`. If an older SDK creates a `.sln` file instead,
+      substitute that filename.
 
-2. Create the four source projects. `-o` sets the output folder, so each
-   project lands under `src/` instead of the repository root.
+- [x] 2. Create the four source projects. `-o` sets the output folder, so
+      each project lands under `src/` instead of the repository root.
 
-   ```bash
-   dotnet new classlib -n ContextSmith.Domain          -o src/ContextSmith.Domain
-   dotnet new classlib -n ContextSmith.Application      -o src/ContextSmith.Application
-   dotnet new classlib -n ContextSmith.Documents.Docx   -o src/ContextSmith.Documents.Docx
-   dotnet new console  -n ContextSmith.Mcp              -o src/ContextSmith.Mcp
-   ```
+      ```bash
+      dotnet new classlib -n ContextSmith.Domain          -o src/ContextSmith.Domain
+      dotnet new classlib -n ContextSmith.Application      -o src/ContextSmith.Application
+      dotnet new classlib -n ContextSmith.Documents.Docx   -o src/ContextSmith.Documents.Docx
+      dotnet new console  -n ContextSmith.Mcp              -o src/ContextSmith.Mcp
+      ```
 
-   `ContextSmith.Mcp` is a console app because it will host the MCP server
-   process (Step 7). The other three are class libraries — code with no
-   entry point of its own.
+      `ContextSmith.Mcp` is a console app because it will host the MCP
+      server process (Step 7). The other three are class libraries — code
+      with no entry point of its own.
 
-3. Create one xUnit test project per source project.
+- [x] 3. Create one xUnit test project per source project that has logic
+      worth testing yet.
 
-   ```bash
-   dotnet new xunit -n ContextSmith.Domain.Tests          -o tests/ContextSmith.Domain.Tests
-   dotnet new xunit -n ContextSmith.Documents.Docx.Tests   -o tests/ContextSmith.Documents.Docx.Tests
-   dotnet new xunit -n ContextSmith.Mcp.Tests              -o tests/ContextSmith.Mcp.Tests
-   ```
+      ```bash
+      dotnet new xunit -n ContextSmith.Domain.Tests          -o tests/ContextSmith.Domain.Tests
+      dotnet new xunit -n ContextSmith.Documents.Docx.Tests   -o tests/ContextSmith.Documents.Docx.Tests
+      dotnet new xunit -n ContextSmith.Mcp.Tests              -o tests/ContextSmith.Mcp.Tests
+      ```
 
-   `ContextSmith.Application` gets its chunking tests in Step 6, once there
-   is application logic worth testing — skip its test project for now.
+      `ContextSmith.Application` gets its chunking tests in Step 6 —
+      skip its test project for now.
 
-4. Add every project to the solution.
+- [x] 4. Add every project to the solution.
 
-   ```bash
-   dotnet sln ContextSmith.sln add src/ContextSmith.Domain
-   dotnet sln ContextSmith.sln add src/ContextSmith.Application
-   dotnet sln ContextSmith.sln add src/ContextSmith.Documents.Docx
-   dotnet sln ContextSmith.sln add src/ContextSmith.Mcp
-   dotnet sln ContextSmith.sln add tests/ContextSmith.Domain.Tests
-   dotnet sln ContextSmith.sln add tests/ContextSmith.Documents.Docx.Tests
-   dotnet sln ContextSmith.sln add tests/ContextSmith.Mcp.Tests
-   ```
+      ```bash
+      dotnet sln ContextSmith.slnx add src/ContextSmith.Domain
+      dotnet sln ContextSmith.slnx add src/ContextSmith.Application
+      dotnet sln ContextSmith.slnx add src/ContextSmith.Documents.Docx
+      dotnet sln ContextSmith.slnx add src/ContextSmith.Mcp
+      dotnet sln ContextSmith.slnx add tests/ContextSmith.Domain.Tests
+      dotnet sln ContextSmith.slnx add tests/ContextSmith.Documents.Docx.Tests
+      dotnet sln ContextSmith.slnx add tests/ContextSmith.Mcp.Tests
+      ```
 
-   A project only builds as part of `dotnet build` at the solution root if
-   it is listed here. Creating the `.csproj` file in step 2 is not enough
-   on its own.
+      A project only builds as part of `dotnet build` at the solution root
+      if it is listed here. Creating the `.csproj` file in step 2 is not
+      enough on its own.
 
-5. Wire up project references, so the dependency direction from
-   `docs/ARCHITECTURE.md` is enforced by the compiler, not just by
-   convention.
+- [x] 5. Wire up project references, so the dependency direction from
+      `docs/ARCHITECTURE.md` is enforced by the compiler, not just by
+      convention.
 
-   ```bash
-   dotnet add src/ContextSmith.Application reference src/ContextSmith.Domain
-   dotnet add src/ContextSmith.Documents.Docx reference src/ContextSmith.Application
-   dotnet add src/ContextSmith.Mcp reference src/ContextSmith.Application
+      ```bash
+      dotnet add src/ContextSmith.Application reference src/ContextSmith.Domain
+      dotnet add src/ContextSmith.Documents.Docx reference src/ContextSmith.Application
+      dotnet add src/ContextSmith.Mcp reference src/ContextSmith.Application
 
-   dotnet add tests/ContextSmith.Domain.Tests reference src/ContextSmith.Domain
-   dotnet add tests/ContextSmith.Documents.Docx.Tests reference src/ContextSmith.Documents.Docx
-   dotnet add tests/ContextSmith.Mcp.Tests reference src/ContextSmith.Mcp
-   ```
+      dotnet add tests/ContextSmith.Domain.Tests reference src/ContextSmith.Domain
+      dotnet add tests/ContextSmith.Documents.Docx.Tests reference src/ContextSmith.Documents.Docx
+      dotnet add tests/ContextSmith.Mcp.Tests reference src/ContextSmith.Mcp
+      ```
 
-   Notice `ContextSmith.Domain` never appears as the *first* argument here
-   — nothing in `src/` should add a reference *from* Domain *to* anything
-   else. That is what "Domain has no external dependency" means in
-   practice.
+      Notice `ContextSmith.Domain` never appears as the *first* argument
+      here — nothing in `src/` should add a reference *from* Domain *to*
+      anything else. That is what "Domain has no external dependency"
+      means in practice.
 
-6. Add the two package dependencies this step's acceptance criteria
-   assume, even though the code that uses them lands in later steps
-   (Step 4 for Open XML, Step 7 for MCP). Adding the reference now, while
-   the projects are still empty, keeps the plumbing separate from the
-   parsing/serving logic.
+- [x] 6. Add the two package dependencies this step's acceptance criteria
+      assume, even though the code that uses them lands in later steps
+      (Step 4 for Open XML, Step 7 for MCP). Adding the reference now,
+      while the projects are still empty, keeps the plumbing separate
+      from the parsing/serving logic.
 
-   ```bash
-   dotnet add src/ContextSmith.Documents.Docx package DocumentFormat.OpenXml
+      ```bash
+      dotnet add src/ContextSmith.Documents.Docx package DocumentFormat.OpenXml
 
-   dotnet add src/ContextSmith.Mcp package ModelContextProtocol
-   dotnet add src/ContextSmith.Mcp package Microsoft.Extensions.Hosting
-   ```
+      dotnet add src/ContextSmith.Mcp package ModelContextProtocol
+      dotnet add src/ContextSmith.Mcp package Microsoft.Extensions.Hosting
+      ```
 
-7. Generate a .NET `.gitignore`, so build output never gets committed.
+- [x] 7. Generate a .NET `.gitignore`, so build output never gets
+      committed. This repository already had a one-line `.gitignore`
+      (the `tmp/` scratch rule) from an earlier step — move it aside,
+      generate the template, then append it back, instead of overwriting
+      it.
 
-   ```bash
-   dotnet new gitignore
-   ```
+      ```bash
+      mv .gitignore .gitignore.custom
+      dotnet new gitignore
+      printf '\n# ContextSmith scratch directory (see AGENTS.md / CLAUDE.md)\ntmp/\n' >> .gitignore
+      rm .gitignore.custom
+      ```
 
-   Then append this repository's own scratch-directory rule to the same
-   file:
+- [x] 8. Move the settings that are now shared across every project out of
+      the individual `.csproj` files:
+      - `Directory.Build.props` — `TargetFramework`, `ImplicitUsings`,
+        `Nullable`, `LangVersion`, `EnforceCodeStyleInBuild`. Generate a
+        starting point with `dotnet new buildprops`, then fill in the
+        `PropertyGroup`.
+      - `Directory.Packages.props` — central package version management.
+        Set `<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>`
+        and list every `<PackageVersion>` used anywhere in the solution.
+        Once this file exists, drop the `Version="..."` attribute from
+        every `<PackageReference>` in every `.csproj` — a version on both
+        sides is a build error (`NU1008`).
+      - `.editorconfig` — generate with `dotnet new editorconfig`; the
+        default template is a reasonable starting point and does not need
+        hand-editing yet.
 
-   ```bash
-   echo "tmp/" >> .gitignore
-   ```
+- [x] 9. Add `.github/workflows/build.yml` that runs `dotnet restore`,
+      `dotnet build`, and `dotnet test` on push and pull request.
 
-8. Add `Directory.Build.props` and `Directory.Packages.props` (central
-   package version management) and `.editorconfig`. These are plain text
-   files — write them directly, there is no `dotnet new` template for
-   their content.
+- [x] 10. Inspect what was generated before committing anything.
 
-9. Add `.github/workflows/build.yml` that runs `dotnet restore`,
-   `dotnet build`, and `dotnet test` on push and pull request.
+      ```bash
+      dotnet sln ContextSmith.slnx list
+      git status
+      ```
 
-10. Inspect what was generated before committing anything.
+      `dotnet sln list` should print all seven projects from step 4. `git
+      status` should show `.cs`, `.csproj`, `.slnx`, `.gitignore`, and the
+      props/editorconfig/workflow files as new — and should **not** show
+      any `bin/` or `obj/` folder. If a `bin/` or `obj/` folder does show
+      up, the `.gitignore` from step 7 ran after files already existed, or
+      is missing an entry — fix the `.gitignore`, not the folders.
 
-    ```bash
-    dotnet sln ContextSmith.sln list
-    git status
-    ```
-
-    `dotnet sln list` should print all seven projects from step 4. `git
-    status` should show `.cs`, `.csproj`, `.sln`, `.gitignore`, and the
-    props/editorconfig/workflow files as new — and should **not** show any
-    `bin/` or `obj/` folder. If a `bin/` or `obj/` folder does show up,
-    the `.gitignore` from step 7 ran after files already existed, or is
-    missing an entry — fix the `.gitignore`, not the folders.
+- [x] 11. Run `pre-commit run --all-files` (see
+      `docs/PREREQUISITES.md`). The generated `dotnet new` templates use
+      CRLF line endings and no trailing newline; the `trailing-whitespace`,
+      `end-of-file-fixer`, and `mixed-line-ending` hooks auto-fix these on
+      the first run — re-run once to confirm a clean pass, then stage the
+      fixes.
 
 **Which files belong in git**
 
 | Belongs in git | Generated — never commit |
 | --- | --- |
-| `ContextSmith.sln`, every `*.csproj` | `bin/`, `obj/` under any project |
+| `ContextSmith.slnx`, every `*.csproj` | `bin/`, `obj/` under any project |
 | Every `*.cs` file | `.vs/` (Visual Studio's own cache folder) |
 | `.gitignore`, `.editorconfig` | NuGet package caches |
 | `Directory.Build.props`, `Directory.Packages.props` | |
@@ -173,9 +204,10 @@ gitignore` template from step 7 already excludes both.
 
 **Validation**
 
-- `dotnet build` exits with code 0.
-- `dotnet test` exits with code 0.
-- The GitHub Actions run for the pull request shows a green check.
+- [x] `dotnet build` exits with code 0.
+- [x] `dotnet test` exits with code 0.
+- [x] `pre-commit run --all-files` passes.
+- [x] The GitHub Actions run for the push to `main` shows a green check.
 
 ### Step 2 — Canonical document model
 
