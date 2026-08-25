@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ContextSmith.Application\ContextSmith.Application.csproj" />
+    <ProjectReference Include="..\ContextSmith.Documents.Text\ContextSmith.Documents.Text.csproj" />
+    <ProjectReference Include="..\ContextSmith.Documents.Docx\ContextSmith.Documents.Docx.csproj" />
   </ItemGroup>
 
   <ItemGroup>

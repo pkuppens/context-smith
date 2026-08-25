@@ -19,4 +19,8 @@
     <ProjectReference Include="..\..\src\ContextSmith.Mcp\ContextSmith.Mcp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\samples\documents\sample.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
