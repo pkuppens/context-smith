@@ -19,4 +19,8 @@
     <ProjectReference Include="..\..\src\ContextSmith.Documents.Docx\ContextSmith.Documents.Docx.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\samples\documents\sample.docx" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
