@@ -8,8 +8,31 @@
 
 Upload a document, or paste a URL. ContextSmith parses it into a structured
 outline, then answers questions about it in a chat window — grounded in
-the document's own text, with the source of every answer shown. See
-[docs/DEMO.md](docs/DEMO.md) to run it locally.
+the document's own text, with the source of every answer shown.
+
+## How to run
+
+Needs the .NET 10 SDK, Node.js 22.22.3+/24.15.0+/26+, and
+[Ollama](https://ollama.com) running locally — see
+[docs/PREREQUISITES.md](docs/PREREQUISITES.md) if any of those need
+installing or updating.
+
+```bash
+# 1. Pull the two models the demo uses (once)
+ollama pull nomic-embed-text
+ollama pull nemotron-3.5-lightning
+
+# 2. Start the API, from the repository root
+dotnet run --project src/ContextSmith.Api
+
+# 3. Start the Angular app, in a second terminal
+cd web
+npm install   # first time only
+npm start
+```
+
+Open http://localhost:4200. Full walkthrough, including troubleshooting:
+[docs/DEMO.md](docs/DEMO.md).
 
 ContextSmith is a C#/.NET reference implementation for document-to-context processing.
 
@@ -39,6 +62,7 @@ The first document phase includes these formats.
 | Plain text | `.txt` | Parse text and infer structure where possible. |
 | Markdown | `.md` | Use Markdown structure as explicit source structure. |
 | Word | `.docx` | Read source structure with Open XML and optional managed services. |
+| HTML | `.html`, `.htm`, or a fetched `http(s)` URL | Parse HTML structure (headings, lists, tables). A URL is fetched over HTTP(S) — no other scheme is accepted — then parsed the same way as an uploaded HTML file. |
 | PDF | `.pdf` | Read text and layout with a PDF parser or a managed document service. |
 
 Later phases can add these formats.
@@ -49,6 +73,26 @@ Later phases can add these formats.
 | PowerPoint | `.pptx` | Convert slides, titles, text blocks, notes, and tables into semantic document structures. |
 
 The canonical model must not depend on a source file type.
+
+## Persistence
+
+The demo (`ContextSmith.Api`) keeps every uploaded or fetched document, its
+chunks, and their embeddings **in memory only** — a `ConcurrentDictionary`
+per document, nothing written to disk, a database, or a vector store.
+
+This means:
+
+- Restarting `ContextSmith.Api` discards every document uploaded before the
+  restart. There is no "resume where I left off."
+- There is no per-user or per-browser-session isolation: any client that
+  knows a `documentId` (returned when a document is uploaded) can chat
+  with it, for as long as that API process keeps running.
+
+This is intentional at this stage — the demo's document store
+(`IDocumentStore`) and retrieval index (`IRetrievalService`) are both
+interfaces (see `docs/ARCHITECTURE.md`), so a persistent, multi-user
+implementation is a drop-in replacement for the in-memory ones, not a
+redesign. It has not been built yet.
 
 ## Non-goals
 
