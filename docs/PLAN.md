@@ -213,8 +213,7 @@ gitignore` template from step 7 already excludes both.
 
 Issue: [#2](https://github.com/pkuppens/context-smith/issues/2)
 
-**Status: implemented on `feature/2-canonical-document-model`, pull request
-open, awaiting review.**
+**Status: done.** Merged via #12.
 
 **Goal.** Define one document model that does not depend on a source file
 type.
@@ -300,25 +299,27 @@ type.
 
 Issue: [#3](https://github.com/pkuppens/context-smith/issues/3)
 
+**Status: done.**
+
 **Goal.** Parse `.txt` and `.md` files into the canonical document model.
 
 **Acceptance criteria**
 
-- [ ] `IDocumentParser` and `DocumentSource` are defined in
+- [x] `IDocumentParser` and `DocumentSource` are defined in
       `ContextSmith.Application` — every parser project from this step
       onward (Docx, Pdf, Excel, PowerPoint) depends on this contract, and
       nothing defined it in Step 1 or 2.
-- [ ] A new project `ContextSmith.Documents.Text` implements
+- [x] A new project `ContextSmith.Documents.Text` implements
       `IDocumentParser` for `.txt`, converting a plain text file into a
       Document with inferred Section and Paragraph elements.
-- [ ] The same project implements `IDocumentParser` for `.md`, mapping
+- [x] The same project implements `IDocumentParser` for `.md`, mapping
       Markdown headings and lists to the canonical model.
-- [ ] A test fixture Markdown file produces a Document with the expected
+- [x] A test fixture Markdown file produces a Document with the expected
       heading count and nesting depth.
 
 **Steps**
 
-- [ ] 1. Define the parsing contract in `ContextSmith.Application`:
+- [x] 1. Define the parsing contract in `ContextSmith.Application`:
 
       ```csharp
       namespace ContextSmith.Application;
@@ -331,7 +332,7 @@ Issue: [#3](https://github.com/pkuppens/context-smith/issues/3)
       }
       ```
 
-- [ ] 2. Create the project and its test project — Step 1 scaffolded four
+- [x] 2. Create the project and its test project — Step 1 scaffolded four
       `src/` projects, not five; this is the first step that needs a new
       one:
 
@@ -344,11 +345,11 @@ Issue: [#3](https://github.com/pkuppens/context-smith/issues/3)
       dotnet add tests/ContextSmith.Documents.Text.Tests reference src/ContextSmith.Documents.Text
       ```
 
-- [ ] 3. Implement `TextDocumentParser` (infers `Section`/`Paragraph` from
+- [x] 3. Implement `TextDocumentParser` (infers `Section`/`Paragraph` from
       blank-line-separated blocks) and `MarkdownDocumentParser` (maps
       `#`/`##`/... headings and `-`/`1.` lists directly, since Markdown
       already states its structure explicitly — no inference needed).
-- [ ] 4. Add fixture files:
+- [x] 4. Add fixture files:
 
       ```bash
       mkdir -p samples/documents
@@ -356,14 +357,14 @@ Issue: [#3](https://github.com/pkuppens/context-smith/issues/3)
 
       Add a small fixture `.txt` and `.md` file, each with a known and
       documented heading/paragraph count.
-- [ ] 5. Add unit tests in `ContextSmith.Documents.Text.Tests` asserting
+- [x] 5. Add unit tests in `ContextSmith.Documents.Text.Tests` asserting
       the parsed structure counts against each fixture.
 
 **Validation**
 
-- [ ] `dotnet build` succeeds.
-- [ ] `dotnet test --filter ContextSmith.Documents.Text.Tests` passes.
-- [ ] `pre-commit run --all-files` passes.
+- [x] `dotnet build` succeeds.
+- [x] `dotnet test --filter ContextSmith.Documents.Text.Tests` passes.
+- [x] `pre-commit run --all-files` passes.
 
 **Out of Scope**
 
@@ -373,30 +374,32 @@ Issue: [#3](https://github.com/pkuppens/context-smith/issues/3)
 
 Issue: [#4](https://github.com/pkuppens/context-smith/issues/4)
 
+**Status: done.**
+
 **Goal.** Parse `.docx` files with the Open XML SDK.
 
 **Acceptance criteria**
 
-- [ ] `ContextSmith.Documents.Docx` implements the `IDocumentParser`
+- [x] `ContextSmith.Documents.Docx` implements the `IDocumentParser`
       contract from Step 3 using the Open XML SDK (already referenced —
       see Step 1).
-- [ ] Word styles, headings, and numbering map to Section, Heading, and
+- [x] Word styles, headings, and numbering map to Section, Heading, and
       List elements in the canonical model.
-- [ ] A fixture `.docx` file produces a Document with the expected heading
+- [x] A fixture `.docx` file produces a Document with the expected heading
       and paragraph counts.
 
 **Steps**
 
-- [ ] 1. Implement `DocxDocumentParser : IDocumentParser` in
+- [x] 1. Implement `DocxDocumentParser : IDocumentParser` in
       `ContextSmith.Documents.Docx`: paragraphs with style `Heading1`
       through `Heading9` map to `Heading` with a matching `Level`;
       `NumberingProperties` maps to `ListBlock`; everything else maps to
       `Paragraph`.
-- [ ] 2. Add a fixture `.docx` file under `samples/documents/` with a
+- [x] 2. Add a fixture `.docx` file under `samples/documents/` with a
       known heading/paragraph/list count. Create it in Word or
       LibreOffice, or generate it with a one-off Open XML SDK script — do
       not hand-craft the underlying zip/XML.
-- [ ] 3. Copy the fixture to the test output directory:
+- [x] 3. Copy the fixture to the test output directory:
 
       ```xml
       <ItemGroup>
@@ -404,14 +407,14 @@ Issue: [#4](https://github.com/pkuppens/context-smith/issues/4)
       </ItemGroup>
       ```
 
-- [ ] 4. Add unit tests asserting the parsed structure counts against the
+- [x] 4. Add unit tests asserting the parsed structure counts against the
       fixture.
 
 **Validation**
 
-- [ ] `dotnet build` succeeds.
-- [ ] `dotnet test --filter ContextSmith.Documents.Docx.Tests` passes.
-- [ ] `pre-commit run --all-files` passes.
+- [x] `dotnet build` succeeds.
+- [x] `dotnet test --filter ContextSmith.Documents.Docx.Tests` passes.
+- [x] `pre-commit run --all-files` passes.
 
 ### Step 5 — PDF
 
@@ -474,20 +477,22 @@ implementation.
 
 Issue: [#6](https://github.com/pkuppens/context-smith/issues/6)
 
+**Status: done.**
+
 **Goal.** Create retrieval chunks from the canonical document model with a
 shared strategy contract.
 
 **Acceptance criteria**
 
-- [ ] `IChunkingStrategy` is defined in `ContextSmith.Application`.
-- [ ] `FixedSizeChunker` and `StructureAwareChunker` implement
+- [x] `IChunkingStrategy` is defined in `ContextSmith.Application`.
+- [x] `FixedSizeChunker` and `StructureAwareChunker` implement
       `IChunkingStrategy`.
-- [ ] A unit test compares the chunk count and chunk boundaries produced by
+- [x] A unit test compares the chunk count and chunk boundaries produced by
       each strategy on the same fixture Document.
 
 **Steps**
 
-- [ ] 1. Create the `ContextSmith.Application` test project Step 1
+- [x] 1. Create the `ContextSmith.Application` test project Step 1
       deliberately skipped, now that there is logic worth testing:
 
       ```bash
@@ -496,45 +501,47 @@ shared strategy contract.
       dotnet add tests/ContextSmith.Application.Tests reference src/ContextSmith.Application
       ```
 
-- [ ] 2. Define `IChunkingStrategy` and the `Chunk` domain type — `Chunk`
+- [x] 2. Define `IChunkingStrategy` and the `Chunk` domain type — `Chunk`
       should carry the extracted text, a reference back to its source
       node(s), and `Provenance`.
-- [ ] 3. Implement `FixedSizeChunker` (splits by a configurable
+- [x] 3. Implement `FixedSizeChunker` (splits by a configurable
       character/token budget, ignoring structure).
-- [ ] 4. Implement `StructureAwareChunker` (chunks along `Section`/
+- [x] 4. Implement `StructureAwareChunker` (chunks along `Section`/
       `Heading` boundaries, keeping each chunk's ancestor heading path as
       context).
-- [ ] 5. Add unit tests in `ContextSmith.Application.Tests` comparing
+- [x] 5. Add unit tests in `ContextSmith.Application.Tests` comparing
       chunk count and boundaries produced by both strategies on the same
       fixture `Document`.
 
 **Validation**
 
-- [ ] `dotnet build` succeeds.
-- [ ] `dotnet test --filter ContextSmith.Application.Tests` passes,
+- [x] `dotnet build` succeeds.
+- [x] `dotnet test --filter ContextSmith.Application.Tests` passes,
       including the chunking comparison test.
-- [ ] `pre-commit run --all-files` passes.
+- [x] `pre-commit run --all-files` passes.
 
 ### Step 7 — MCP
 
 Issue: [#7](https://github.com/pkuppens/context-smith/issues/7)
 
+**Status: done.**
+
 **Goal.** Expose the document preparation use case through MCP.
 
 **Acceptance criteria**
 
-- [ ] `ContextSmith.Mcp` hosts an MCP server that exposes the
+- [x] `ContextSmith.Mcp` hosts an MCP server that exposes the
       `prepare_document` tool, the
       `contextsmith://documents/{documentId}/structure` resource, and the
       `prepare-document-for-rag` prompt.
-- [ ] `ContextSmith.Mcp` calls `ContextSmith.Application` only. It does not
+- [x] `ContextSmith.Mcp` calls `ContextSmith.Application` only. It does not
       call `ContextSmith.Domain` directly.
-- [ ] An in-process integration test calls `prepare_document` with a
+- [x] An in-process integration test calls `prepare_document` with a
       fixture document and asserts the returned structure.
 
 **Steps**
 
-- [ ] 1. `ContextSmith.Mcp` already references `ModelContextProtocol` and
+- [x] 1. `ContextSmith.Mcp` already references `ModelContextProtocol` and
       `Microsoft.Extensions.Hosting` from Step 1. Confirm the installed
       version and check its current samples before writing server code —
       the tool/resource/prompt registration API can change between
@@ -545,29 +552,29 @@ Issue: [#7](https://github.com/pkuppens/context-smith/issues/7)
       ```
 
       (Installed as of Step 1: `ModelContextProtocol` 2.2.0.)
-- [ ] 2. Build a `Host` (`Microsoft.Extensions.Hosting`) in `Program.cs`
+- [x] 2. Build a `Host` (`Microsoft.Extensions.Hosting`) in `Program.cs`
       that registers the MCP server and the `ContextSmith.Application`
       services it calls.
-- [ ] 3. Implement the `prepare_document` tool: accepts a document source,
+- [x] 3. Implement the `prepare_document` tool: accepts a document source,
       calls the matching `IDocumentParser` (selected by file extension),
       and returns the canonical structure.
-- [ ] 4. Implement the `contextsmith://documents/{documentId}/structure`
+- [x] 4. Implement the `contextsmith://documents/{documentId}/structure`
       resource, returning the stored structure for a previously prepared
       document. An in-memory store is enough at this stage — no
       persistence requirement yet.
-- [ ] 5. Implement the `prepare-document-for-rag` prompt per its one-line
+- [x] 5. Implement the `prepare-document-for-rag` prompt per its one-line
       goal in `docs/ARCHITECTURE.md`.
-- [ ] 6. Add an in-process integration test in `ContextSmith.Mcp.Tests`
+- [x] 6. Add an in-process integration test in `ContextSmith.Mcp.Tests`
       that invokes `prepare_document` in-process (no separate server
       process) with a fixture document and asserts the returned
       structure.
 
 **Validation**
 
-- [ ] `dotnet build` succeeds.
-- [ ] `dotnet test --filter ContextSmith.Mcp.Tests` passes, including the
+- [x] `dotnet build` succeeds.
+- [x] `dotnet test --filter ContextSmith.Mcp.Tests` passes, including the
       tool invocation test.
-- [ ] `pre-commit run --all-files` passes.
+- [x] `pre-commit run --all-files` passes.
 
 ### Step 8 — Embeddings and retrieval
 
@@ -755,6 +762,8 @@ not available in this environment.
 
 Issue: [#13](https://github.com/pkuppens/context-smith/issues/13)
 
+**Status: done.**
+
 **Goal.** Parse HTML into the canonical document model, from an uploaded
 file or a fetched URL — making HTML the fifth parseable format and the
 first one whose source can be a URL instead of a file.
@@ -764,6 +773,8 @@ See the issue for full acceptance criteria, steps, and validation.
 ### Step 13 — Local embeddings and retrieval (Ollama)
 
 Issue: [#14](https://github.com/pkuppens/context-smith/issues/14)
+
+**Status: done.**
 
 **Goal.** Define the `IEmbeddingService`/`IRetrievalService` contracts from
 Step 8 and provide a local, credential-free implementation backed by
@@ -775,6 +786,8 @@ See the issue for full acceptance criteria, steps, and validation.
 ### Step 14 — Angular demo: upload, parse, chat
 
 Issue: [#15](https://github.com/pkuppens/context-smith/issues/15)
+
+**Status: done.** See `docs/DEMO.md` to run it.
 
 **Goal.** A running end-to-end demo: `ContextSmith.Api` (a second
 Presentation-layer project alongside `ContextSmith.Mcp`) backs an Angular
@@ -788,10 +801,11 @@ See the issue for full acceptance criteria, steps, and validation.
 
 ContextSmith is under active development.
 
-Step 1 (repository and application foundation) and Step 2 (canonical
-document model) are done — see the commit history and issues #1, #2. The
-current goal is the demo track (Steps 3, 4, 6, 7, 12, 13, 14): a small,
-testable, locally-runnable document-processing core with an MCP server, a
-REST API, and an Angular front end. Steps 5, 8, 9, 10, 11 (Azure-backed PDF,
-embeddings, deployment, evaluation, and additional Office formats) stay on
-the roadmap for when Azure credentials are available.
+Steps 1-4, 6, 7, and 12-14 are done — a working local demo (`docs/DEMO.md`):
+upload or fetch a document (txt/md/docx/html, or any http(s) URL), parse it
+into the canonical model, chunk it, embed and index the chunks locally with
+Ollama, and ask grounded questions about it through an Angular UI, with the
+MCP server's own prompts offered as sample prompts. Steps 5, 8, 9, 10, 11
+(Azure-backed PDF, embeddings, deployment, evaluation, and additional
+Office formats) stay on the roadmap for when Azure credentials are
+available.

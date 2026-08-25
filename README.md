@@ -72,6 +72,7 @@ traceable and measurable AI context
 - [docs/PREREQUISITES.md](docs/PREREQUISITES.md) — the tools and minimum versions a development machine needs. Read before running a `dotnet` command; update when a required tool or version changes.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — the processing pipeline, the canonical document model, the Azure/local service split, and the MCP surface. Read before changing a pipeline stage, the document model, or a service boundary.
 - [docs/PLAN.md](docs/PLAN.md) — the implementation roadmap and current status. Read to see what's next; update when a step starts or finishes.
+- [docs/DEMO.md](docs/DEMO.md) — how to run the end-to-end demo (upload/URL, parse, chat) locally with Ollama.
 - [docs/RESEARCH.md](docs/RESEARCH.md) — the research questions the project must answer and where it claims value over a direct managed pipeline. Read before proposing a chunking/embedding strategy comparison; update when a question is answered.
 - `AGENTS.md` — shared conventions for AI coding agents (issue tracker, domain docs, writing style). `CLAUDE.md` adds Claude-specific notes on top.
 

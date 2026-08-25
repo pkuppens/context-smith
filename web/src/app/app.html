@@ -1,0 +1,97 @@
+<main>
+  <h1>ContextSmith</h1>
+  <p class="tagline">Upload a document or paste a URL, then ask questions about it.</p>
+
+  <section class="panel">
+    <h2>1. Document</h2>
+
+    <div class="upload-row">
+      <label class="file-picker">
+        Choose file
+        <input type="file" accept=".txt,.md,.docx,.html,.htm" (change)="onFileSelected($event)" />
+      </label>
+
+      <span class="or">or</span>
+
+      <input
+        type="url"
+        placeholder="https://example.com/page.html"
+        [ngModel]="urlInput()"
+        (ngModelChange)="urlInput.set($event)"
+        (keydown.enter)="submitUrl()"
+      />
+      <button type="button" (click)="submitUrl()" [disabled]="uploading()">Fetch</button>
+    </div>
+
+    @if (uploading()) {
+      <p class="status">Parsing…</p>
+    }
+    @if (uploadError()) {
+      <p class="status error">{{ uploadError() }}</p>
+    }
+
+    @if (document(); as doc) {
+      <div class="document-summary">
+        <p>
+          <strong>{{ fileName() }}</strong>
+          — {{ doc.sectionCount }} sections, {{ doc.headingCount }} headings,
+          {{ doc.paragraphCount }} paragraphs
+        </p>
+        <ul class="outline">
+          <app-document-outline [node]="doc.outline" />
+        </ul>
+      </div>
+    }
+  </section>
+
+  <section class="panel">
+    <h2>2. Ask</h2>
+
+    @if (prompts().length) {
+      <div class="sample-prompts">
+        <span class="label">Sample prompts:</span>
+        @for (prompt of prompts(); track prompt.name) {
+          <button type="button" class="prompt-chip" (click)="usePrompt(prompt)">
+            {{ prompt.name }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="chat-log">
+      @for (message of messages(); track $index) {
+        <div class="message" [class.assistant]="message.role === 'assistant'">
+          <p>{{ message.text }}</p>
+          @if (message.sources?.length) {
+            <details>
+              <summary>{{ message.sources!.length }} source(s)</summary>
+              @for (source of message.sources; track $index) {
+                <div class="source">
+                  <em>{{ source.headingPath.join(' > ') }}</em>
+                  <p>{{ source.text }}</p>
+                </div>
+              }
+            </details>
+          }
+        </div>
+      }
+      @if (sending()) {
+        <p class="status">Thinking…</p>
+      }
+    </div>
+
+    <div class="chat-input-row">
+      <textarea
+        rows="2"
+        placeholder="Ask a question about the document above…"
+        [disabled]="!document()"
+        [ngModel]="chatInput()"
+        (ngModelChange)="chatInput.set($event)"
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+      ></textarea>
+      <button type="button" (click)="sendMessage()" [disabled]="!document() || sending()">
+        Send
+      </button>
+    </div>
+  </section>
+</main>
