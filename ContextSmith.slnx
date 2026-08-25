@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/ContextSmith.Api/ContextSmith.Api.csproj" />
     <Project Path="src/ContextSmith.Application/ContextSmith.Application.csproj" />
     <Project Path="src/ContextSmith.Documents.Docx/ContextSmith.Documents.Docx.csproj" />
     <Project Path="src/ContextSmith.Documents.Html/ContextSmith.Documents.Html.csproj" />
@@ -9,6 +10,7 @@
     <Project Path="src/ContextSmith.Retrieval.Local/ContextSmith.Retrieval.Local.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/ContextSmith.Api.Tests/ContextSmith.Api.Tests.csproj" />
     <Project Path="tests/ContextSmith.Application.Tests/ContextSmith.Application.Tests.csproj" />
     <Project Path="tests/ContextSmith.Documents.Docx.Tests/ContextSmith.Documents.Docx.Tests.csproj" />
     <Project Path="tests/ContextSmith.Documents.Html.Tests/ContextSmith.Documents.Html.Tests.csproj" />
