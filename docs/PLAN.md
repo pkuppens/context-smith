@@ -739,13 +739,59 @@ evaluation approach are stable.
       passes.
 - [ ] `pre-commit run --all-files` passes.
 
+## Demo track
+
+The steps above are the original roadmap, in dependency order. The three
+steps below were added to reach a concrete, runnable demo: an Angular app
+where a user uploads a document or pastes a URL, watches it get parsed, and
+asks questions about it in a chat window, answered by a local Ollama model
+grounded in the retrieved chunks — with the MCP prompts from Step 7 offered
+as sample prompts. They do not replace Steps 5, 8, 9, 10, 11 (Azure-backed
+PDF, embeddings, deployment, evaluation, Excel/PowerPoint) — those stay on
+the roadmap, just not required for this demo, since Azure credentials are
+not available in this environment.
+
+### Step 12 — HTML document parsing (file or URL)
+
+Issue: [#13](https://github.com/pkuppens/context-smith/issues/13)
+
+**Goal.** Parse HTML into the canonical document model, from an uploaded
+file or a fetched URL — making HTML the fifth parseable format and the
+first one whose source can be a URL instead of a file.
+
+See the issue for full acceptance criteria, steps, and validation.
+
+### Step 13 — Local embeddings and retrieval (Ollama)
+
+Issue: [#14](https://github.com/pkuppens/context-smith/issues/14)
+
+**Goal.** Define the `IEmbeddingService`/`IRetrievalService` contracts from
+Step 8 and provide a local, credential-free implementation backed by
+Ollama, so the pipeline and the demo run entirely offline. Step 8's Azure
+implementation of the same interfaces remains a separate, later step.
+
+See the issue for full acceptance criteria, steps, and validation.
+
+### Step 14 — Angular demo: upload, parse, chat
+
+Issue: [#15](https://github.com/pkuppens/context-smith/issues/15)
+
+**Goal.** A running end-to-end demo: `ContextSmith.Api` (a second
+Presentation-layer project alongside `ContextSmith.Mcp`) backs an Angular
+app that uploads/fetches a document, shows its parsed structure, and
+answers chat questions over it — grounded in retrieved chunks, using the
+MCP prompts as sample prompts.
+
+See the issue for full acceptance criteria, steps, and validation.
+
 ## Status
 
 ContextSmith is under active development.
 
-Step 1 (repository and application foundation) is done — see the commit
-history and issue #1. Step 2 (canonical document model) is implemented on a
-feature branch, pull request open. The current goal is a small and testable
-document-processing core (Steps 2-4). Later steps add chunking, MCP access,
-retrieval, Azure deployment, comparative evaluation, and additional Office
-formats.
+Step 1 (repository and application foundation) and Step 2 (canonical
+document model) are done — see the commit history and issues #1, #2. The
+current goal is the demo track (Steps 3, 4, 6, 7, 12, 13, 14): a small,
+testable, locally-runnable document-processing core with an MCP server, a
+REST API, and an Angular front end. Steps 5, 8, 9, 10, 11 (Azure-backed PDF,
+embeddings, deployment, evaluation, and additional Office formats) stay on
+the roadmap for when Azure credentials are available.
