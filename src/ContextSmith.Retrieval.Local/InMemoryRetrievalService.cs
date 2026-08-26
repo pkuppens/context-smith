@@ -5,17 +5,17 @@ namespace ContextSmith.Retrieval.Local;
 
 public sealed class InMemoryRetrievalService : IRetrievalService
 {
-    private readonly ConcurrentBag<(Chunk Chunk, float[] Embedding)> _index = [];
+    private readonly ConcurrentDictionary<string, (Chunk Chunk, float[] Embedding)> _index = new();
 
     public Task IndexAsync(Chunk chunk, float[] embedding, CancellationToken cancellationToken = default)
     {
-        _index.Add((chunk, embedding));
+        _index[chunk.Id] = (chunk, embedding);
         return Task.CompletedTask;
     }
 
     public Task<IReadOnlyList<Chunk>> SearchAsync(float[] queryEmbedding, int topK, CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<Chunk> results = _index
+        IReadOnlyList<Chunk> results = _index.Values
             .Select(entry => (entry.Chunk, Score: CosineSimilarity(queryEmbedding, entry.Embedding)))
             .OrderByDescending(entry => entry.Score)
             .Take(topK)

@@ -19,7 +19,7 @@ public sealed class FixedSizeChunker(int maxCharacters = 500) : IChunkingStrateg
                 return;
             }
 
-            chunks.Add(new Chunk(string.Join(" ", buffer), firstProvenance!, firstHeadingPath));
+            chunks.Add(new Chunk(Guid.NewGuid().ToString("n"), string.Join(" ", buffer), firstProvenance!, firstHeadingPath));
             buffer.Clear();
             bufferLength = 0;
             firstProvenance = null;
