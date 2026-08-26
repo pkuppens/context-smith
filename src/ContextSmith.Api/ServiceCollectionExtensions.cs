@@ -52,10 +52,12 @@ public static class ServiceCollectionExtensions
 
         services.AddHttpClient("ollama", client => client.BaseAddress = new Uri(ollamaBaseUrl));
 
-        services.AddSingleton<IEmbeddingService>(sp =>
+        var embeddingProvider = configuration["Embedding:Provider"] ?? "Ollama";
+
+        services.AddSingleton<IEmbeddingService>(sp => embeddingProvider switch
         {
-            var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("ollama");
-            return new OllamaEmbeddingService(httpClient, embeddingModel);
+            "Ollama" => new OllamaEmbeddingService(sp.GetRequiredService<IHttpClientFactory>().CreateClient("ollama"), embeddingModel),
+            var other => throw new NotSupportedException($"Unknown Embedding:Provider '{other}'."),
         });
 
         services.AddSingleton(sp =>
