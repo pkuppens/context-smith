@@ -7,7 +7,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Logging.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace);
 
-builder.Services.AddContextSmithApplication();
+builder.Services.AddContextSmithApplication(builder.Configuration);
 
 builder.Services
     .AddMcpServer()

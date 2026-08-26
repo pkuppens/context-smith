@@ -1,4 +1,5 @@
 using ContextSmith.Application;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ContextSmith.Mcp.Tests;
@@ -8,7 +9,8 @@ public class PrepareDocumentToolTests
     [Fact]
     public async Task PrepareDocument_parses_by_extension_and_stores_the_result()
     {
-        var services = new ServiceCollection().AddContextSmithApplication();
+        var configuration = new ConfigurationBuilder().Build();
+        var services = new ServiceCollection().AddContextSmithApplication(configuration);
         await using var provider = services.BuildServiceProvider();
 
         var parserSelector = provider.GetRequiredService<IDocumentParserSelector>();

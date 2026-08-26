@@ -33,11 +33,12 @@ public sealed class DocumentProcessingService(
     public async Task<(string Answer, IReadOnlyList<Chunk> Sources)> ChatAsync(
         string documentId, string message, CancellationToken cancellationToken)
     {
-        if (!retrievalRegistry.TryGet(documentId, out var retrievalService))
+        if (documentStore.Get(documentId) is null)
         {
             throw new KeyNotFoundException($"No document is indexed under id '{documentId}'.");
         }
 
+        var retrievalService = retrievalRegistry.GetOrCreate(documentId);
         var queryEmbedding = await embeddingService.EmbedAsync(message, cancellationToken).ConfigureAwait(false);
         var sources = await retrievalService.SearchAsync(queryEmbedding, topK: 4, cancellationToken).ConfigureAwait(false);
 

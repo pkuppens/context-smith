@@ -1,15 +1,31 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 using ContextSmith.Application;
 
-namespace ContextSmith.Retrieval.Local;
+namespace ContextSmith.Persistence.Local;
 
-public sealed class InMemoryRetrievalService : IRetrievalService
+public sealed class FileRetrievalService : IRetrievalService
 {
-    private readonly ConcurrentDictionary<string, (Chunk Chunk, float[] Embedding)> _index = new();
+    private readonly string _indexDirectory;
+    private readonly string _indexPath;
+    private readonly ConcurrentDictionary<string, IndexEntry> _index;
+
+    public FileRetrievalService(string rootDirectory, string documentId)
+    {
+        _indexDirectory = Path.Combine(rootDirectory, "retrieval");
+        _indexPath = Path.Combine(_indexDirectory, $"{documentId}.json");
+
+        var entries = File.Exists(_indexPath)
+            ? JsonSerializer.Deserialize<List<IndexEntry>>(File.ReadAllText(_indexPath)) ?? []
+            : [];
+
+        _index = new ConcurrentDictionary<string, IndexEntry>(entries.ToDictionary(entry => entry.Chunk.Id));
+    }
 
     public Task IndexAsync(Chunk chunk, float[] embedding, CancellationToken cancellationToken = default)
     {
-        _index[chunk.Id] = (chunk, embedding);
+        _index[chunk.Id] = new IndexEntry(chunk, embedding);
+        Save();
         return Task.CompletedTask;
     }
 
@@ -23,6 +39,12 @@ public sealed class InMemoryRetrievalService : IRetrievalService
             .ToList();
 
         return Task.FromResult(results);
+    }
+
+    private void Save()
+    {
+        Directory.CreateDirectory(_indexDirectory);
+        File.WriteAllText(_indexPath, JsonSerializer.Serialize(_index.Values.ToList()));
     }
 
     private static float CosineSimilarity(float[] a, float[] b)
@@ -47,4 +69,6 @@ public sealed class InMemoryRetrievalService : IRetrievalService
 
         return (float)(dot / (Math.Sqrt(normA) * Math.Sqrt(normB)));
     }
+
+    private sealed record IndexEntry(Chunk Chunk, float[] Embedding);
 }
