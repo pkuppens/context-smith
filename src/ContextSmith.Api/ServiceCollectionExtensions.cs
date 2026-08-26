@@ -2,6 +2,7 @@ using ContextSmith.Application;
 using ContextSmith.Documents.Docx;
 using ContextSmith.Documents.Html;
 using ContextSmith.Documents.Text;
+using ContextSmith.Persistence.Local;
 using ContextSmith.Retrieval.Local;
 
 namespace ContextSmith.Api;
@@ -10,8 +11,23 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddContextSmithApi(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<IDocumentStore, InMemoryDocumentStore>();
-        services.AddSingleton<DocumentRetrievalRegistry>();
+        var storageProvider = configuration["Storage:Provider"] ?? "InMemory";
+        var storageDirectory = configuration["Storage:Directory"] ?? "data";
+
+        services.AddSingleton<IDocumentStore>(_ => storageProvider switch
+        {
+            "InMemory" => new InMemoryDocumentStore(),
+            "File" => new FileDocumentStore(storageDirectory),
+            var other => throw new NotSupportedException($"Unknown Storage:Provider '{other}'."),
+        });
+
+        services.AddSingleton(_ => new DocumentRetrievalRegistry(storageProvider switch
+        {
+            "InMemory" => documentId => new InMemoryRetrievalService(),
+            "File" => documentId => new FileRetrievalService(storageDirectory, documentId),
+            var other => throw new NotSupportedException($"Unknown Storage:Provider '{other}'."),
+        }));
+
         services.AddScoped<DocumentProcessingService>();
 
         services.AddSingleton<IDocumentParserSelector>(_ =>

@@ -9,6 +9,7 @@
     <ProjectReference Include="..\ContextSmith.Documents.Text\ContextSmith.Documents.Text.csproj" />
     <ProjectReference Include="..\ContextSmith.Documents.Docx\ContextSmith.Documents.Docx.csproj" />
     <ProjectReference Include="..\ContextSmith.Documents.Html\ContextSmith.Documents.Html.csproj" />
+    <ProjectReference Include="..\ContextSmith.Persistence.Local\ContextSmith.Persistence.Local.csproj" />
   </ItemGroup>
 
   <ItemGroup>

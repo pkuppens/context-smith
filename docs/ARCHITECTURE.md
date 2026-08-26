@@ -195,6 +195,32 @@ Examples include:
 
 An LLM should not recreate information that deterministic code can read reliably.
 
+## Persistence
+
+`IDocumentStore` and `IRetrievalService` store data behind a narrow contract. Each
+implementation lives in one file. `ContextSmith.Application` defines both
+interfaces. `ContextSmith.Retrieval.Local` and `ContextSmith.Persistence.Local`
+hold the in-memory and file-backed implementations.
+
+A future SQLite or PostgreSQL implementation can use the same two
+interfaces. It does not need interface changes. A likely schema:
+
+```text
+documents(id TEXT PRIMARY KEY, content TEXT, updated_at TIMESTAMP)
+chunks(id TEXT PRIMARY KEY, document_id TEXT, text TEXT, heading_path TEXT, source_id TEXT, location TEXT)
+embeddings(chunk_id TEXT PRIMARY KEY REFERENCES chunks(id), vector BLOB, dimension INTEGER)
+```
+
+SQLite has no native vector column. A first implementation can store the
+vector as a packed `BLOB` and score matches in application code, the same
+way `InMemoryRetrievalService` and `FileRetrievalService` do today.
+PostgreSQL can use the `pgvector` extension for a native vector column and
+index instead.
+
+Configuration selects the active backend at startup through `Storage:Provider`
+(`InMemory` or `File` today). Adding a database backend means adding one more
+case to this switch, not changing the interfaces or their callers.
+
 ## Relationship with Azure
 
 ContextSmith does not replace Azure Document Intelligence, Microsoft Foundry, or Azure AI Search.
