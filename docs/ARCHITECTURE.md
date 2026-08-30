@@ -165,14 +165,17 @@ The same rule applies to embeddings and to retrieval.
 Azure AI Search   Local (file)     Custom provider
 ```
 
-`Embedding:Provider` and `Storage:Provider` select the active implementation
+`Embedding:Provider` and `Retrieval:Provider` select the active implementation
 of each interface from configuration. Adding a provider means adding one more
 case to the switch that builds the service, not a code change at any call
-site. `Ollama` is the only `Embedding:Provider` implemented today (see
-`ContextSmith.Retrieval.Local`); `InMemory` and `File` are the implemented
-`Storage:Provider` values (see the Persistence section above). An Azure
-OpenAI `Embedding:Provider` and an Azure AI Search-backed `IRetrievalService`
-are tracked separately (see the "Relationship with Azure" section below).
+site. `Ollama` and `AzureOpenAI` are the implemented `Embedding:Provider`
+values (`ContextSmith.Retrieval.Local` and `ContextSmith.Retrieval.Azure`,
+respectively). `Retrieval:Provider` is a separate axis from `Storage:Provider`
+because Azure AI Search is a vector index, not a general document store, so
+it cannot also serve as an `IDocumentStore`; when `Retrieval:Provider` is
+unset it defaults to following `Storage:Provider`, preserving the original
+`InMemory`/`File` behavior. `InMemory`, `File`, and `AzureSearch` are the
+implemented `Retrieval:Provider` values.
 
 A test can compare combinations of chunking strategies and embedding models.
 

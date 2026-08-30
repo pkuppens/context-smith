@@ -3,6 +3,7 @@ using ContextSmith.Documents.Docx;
 using ContextSmith.Documents.Html;
 using ContextSmith.Documents.Text;
 using ContextSmith.Persistence.Local;
+using ContextSmith.Retrieval.Azure;
 using ContextSmith.Retrieval.Local;
 
 namespace ContextSmith.Api;
@@ -20,13 +21,6 @@ public static class ServiceCollectionExtensions
             "File" => new FileDocumentStore(storageDirectory),
             var other => throw new NotSupportedException($"Unknown Storage:Provider '{other}'."),
         });
-
-        services.AddSingleton(_ => new DocumentRetrievalRegistry(storageProvider switch
-        {
-            "InMemory" => documentId => new InMemoryRetrievalService(),
-            "File" => documentId => new FileRetrievalService(storageDirectory, documentId),
-            var other => throw new NotSupportedException($"Unknown Storage:Provider '{other}'."),
-        }));
 
         services.AddScoped<DocumentProcessingService>();
 
@@ -53,10 +47,17 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient("ollama", client => client.BaseAddress = new Uri(ollamaBaseUrl));
 
         var embeddingProvider = configuration["Embedding:Provider"] ?? "Ollama";
+        var azureOpenAiEmbeddingDeployment = configuration["AzureOpenAI:EmbeddingDeployment"];
 
         services.AddSingleton<IEmbeddingService>(sp => embeddingProvider switch
         {
             "Ollama" => new OllamaEmbeddingService(sp.GetRequiredService<IHttpClientFactory>().CreateClient("ollama"), embeddingModel),
+            "AzureOpenAI" => new AzureOpenAiEmbeddingService(
+                new Uri(configuration["AzureOpenAI:Endpoint"]
+                    ?? throw new InvalidOperationException("AzureOpenAI:Endpoint is required when Embedding:Provider is 'AzureOpenAI'.")),
+                azureOpenAiEmbeddingDeployment
+                    ?? throw new InvalidOperationException("AzureOpenAI:EmbeddingDeployment is required when Embedding:Provider is 'AzureOpenAI'."),
+                configuration["AzureOpenAI:ApiKey"]),
             var other => throw new NotSupportedException($"Unknown Embedding:Provider '{other}'."),
         });
 
@@ -65,6 +66,28 @@ public static class ServiceCollectionExtensions
             var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("ollama");
             return new OllamaChatClient(httpClient, chatModel);
         });
+
+        // Retrieval:Provider is a separate axis from Storage:Provider: Azure AI Search is a
+        // vector index, not a general document store, so it cannot fill the IDocumentStore
+        // role above. When unset, retrieval defaults to following Storage:Provider, which
+        // preserves the InMemory/File behavior from #8 unchanged.
+        var retrievalProvider = configuration["Retrieval:Provider"] ?? storageProvider;
+
+        services.AddSingleton(_ => new DocumentRetrievalRegistry(retrievalProvider switch
+        {
+            "InMemory" => documentId => new InMemoryRetrievalService(),
+            "File" => documentId => new FileRetrievalService(storageDirectory, documentId),
+            "AzureSearch" => documentId => new AzureAiSearchRetrievalService(
+                new Uri(configuration["AzureSearch:Endpoint"]
+                    ?? throw new InvalidOperationException("AzureSearch:Endpoint is required when Retrieval:Provider is 'AzureSearch'.")),
+                configuration["AzureSearch:IndexPrefix"] ?? "contextsmith",
+                documentId,
+                EmbeddingDimensionResolver.Resolve(
+                    int.TryParse(configuration["AzureSearch:VectorDimension"], out var configuredDimension) ? configuredDimension : null,
+                    azureOpenAiEmbeddingDeployment ?? embeddingModel),
+                configuration["AzureSearch:ApiKey"]),
+            var other => throw new NotSupportedException($"Unknown Retrieval:Provider '{other}'."),
+        }));
 
         return services;
     }
