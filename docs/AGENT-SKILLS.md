@@ -117,6 +117,12 @@ prompt content as the pilot body. It anticipates the SEP-2640 direction
 compatibility with the SEP while it is still in Draft status — see Out of
 Scope in #21.
 
+The PoC addresses a skill by a bare `skillId` (`contextsmith://skills/{skillId}`)
+rather than SEP-2640's full-URI addressing (`skill://<skill-path>/SKILL.md`), where
+uniqueness is structural. A bare id needs its own ambiguity policy once more than one
+skill source is in play; the catalog validates id uniqueness at construction time to
+close the gap for now. See #23 for the general resolution semantics.
+
 ### Manual verification
 
 Verified against the MCP Inspector (`npx @modelcontextprotocol/inspector`)

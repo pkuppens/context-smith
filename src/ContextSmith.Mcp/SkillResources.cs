@@ -33,6 +33,19 @@ public static class SkillCatalog
 
     public static IReadOnlyList<SkillDefinition> All { get; } = [PrepareDocumentForRag];
 
+    static SkillCatalog()
+    {
+        var duplicateIds = All.GroupBy(skill => skill.Id).Where(group => group.Count() > 1).Select(group => group.Key);
+        if (duplicateIds.Any())
+        {
+            throw new InvalidOperationException($"Duplicate skill id(s) in SkillCatalog: {string.Join(", ", duplicateIds)}.");
+        }
+    }
+
+    // Find() assumes ids are unique, enforced above at construction time. That's sufficient
+    // for this hardcoded, single-source catalog, but not a general answer: once skills come
+    // from more than one source, ambiguity needs its own resolution policy (return all
+    // matches, error, or move to SEP-2640-style full-URI addressing). Tracked in #23.
     public static SkillDefinition? Find(string skillId) =>
         All.FirstOrDefault(skill => skill.Id == skillId);
 }
