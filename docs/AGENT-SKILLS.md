@@ -9,6 +9,25 @@ exploration.
 For term definitions (Skill, Prompt, Skill Placement Layer), see `CONTEXT.md` at
 the repo root.
 
+## Summary
+
+- ContextSmith should serve Skills over MCP using **layer 1: MCP-server-native,
+  Resources-based** — the direction the industry working group has converged on
+  as **SEP-2640**.
+- ContextSmith should **not** build its own addressing scheme for skills. The
+  PoC in this repo (`contextsmith://skills/{skillId}`) used a project-local,
+  bare-id scheme for speed. That choice is now superseded: this repo adopts
+  SEP-2640's full-URI addressing (`skill://<skill-path>/SKILL.md`) instead of
+  maintaining a local variant.
+- This matters because a bare id is ambiguous once skills come from more than
+  one source, and a review comment on the PoC (PR #22) caught this. SEP-2640
+  avoids the problem structurally, by construction, rather than by validation
+  code this project would otherwise have to write and maintain.
+- No other placement layer (agent/client-native, transport-agnostic content
+  format) is recommended for build work in this repo at this time.
+- Follow-up work — migrating the PoC's URI scheme to match SEP-2640 — is
+  tracked in #23.
+
 ## Responsibilities: Tools, Resources, Prompts, Skills, MCP, Agent, LLM
 
 Each part of the system has one job. The diagram shows who owns what, and where
@@ -119,9 +138,10 @@ Scope in #21.
 
 The PoC addresses a skill by a bare `skillId` (`contextsmith://skills/{skillId}`)
 rather than SEP-2640's full-URI addressing (`skill://<skill-path>/SKILL.md`), where
-uniqueness is structural. A bare id needs its own ambiguity policy once more than one
-skill source is in play; the catalog validates id uniqueness at construction time to
-close the gap for now. See #23 for the general resolution semantics.
+uniqueness is structural. The catalog validates id uniqueness at construction time as
+a stopgap. See [Conclusion](#addressing-adopt-sep-2640s-scheme-dont-invent-one) — this
+project has decided to migrate to SEP-2640's addressing rather than maintain the local
+scheme; tracked in #23.
 
 ### Manual verification
 
@@ -135,7 +155,7 @@ pointed at the local `ContextSmith.Mcp` server:
 3. Reading `contextsmith://skills/prepare-document-for-rag` returns the full
    skill body.
 
-## Recommendation
+## Conclusion
 
 Pursue **layer 1 (MCP-server-native, SEP-2640-aligned)** for ContextSmith's own
 bundled skills — it needs no new client behavior beyond what MCP clients
@@ -154,6 +174,29 @@ Responsibility should not split across layers for this repo's own bundled
 skills — layer 1 alone covers storage, discovery, and injection for content
 ContextSmith owns. Splitting only becomes useful once a shared-library source
 (layer 3) is in play, which is out of scope here.
+
+### Addressing: adopt SEP-2640's scheme, don't invent one
+
+The PoC's `contextsmith://skills/{skillId}` addressing was a project-local
+shortcut, chosen to get a working end-to-end resource pair quickly. A PR #22
+review comment identified the cost of that shortcut: a bare id is ambiguous
+the moment two skills share one, and the fix would have been project-specific
+validation code to maintain.
+
+SEP-2640 already solves this, by construction, with full-URI addressing:
+`skill://<skill-path>/SKILL.md`, where `<skill-path>` ends in the skill's
+`name` and any preceding segments are a server-chosen organizational prefix.
+Two skills cannot collide under this scheme without also colliding in name and
+prefix, which is a different, and already-necessary, uniqueness requirement —
+not one this project has to invent or validate separately.
+
+The decision: **adopt SEP-2640's addressing rather than maintain a local
+alternative.** ContextSmith gains nothing by diverging from the public
+standard here, and a divergent scheme is a cost the project would carry alone
+— every future client integration, every future skill source, and every
+future contributor reading this code would need to learn ContextSmith's
+scheme instead of the one the wider ecosystem already uses. Migrating the PoC
+to `skill://` addressing is tracked in #23.
 
 ## Follow or contribute
 
