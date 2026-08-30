@@ -14,6 +14,7 @@ builder.Services
     .WithStdioServerTransport()
     .WithTools<PrepareDocumentTool>()
     .WithResources<DocumentResources>()
+    .WithResources<SkillResources>()
     .WithPrompts<ContextSmithPrompts>();
 
 await builder.Build().RunAsync();
