@@ -6,12 +6,17 @@ using ModelContextProtocol.Server;
 
 namespace ContextSmith.Mcp;
 
-public sealed record SkillDefinition(string Id, string Name, string Description, string Body);
+// Name is the skill's identity: per SEP-2640, the final segment of a skill's URI
+// path MUST equal its name, which makes the name unique by construction. See
+// ADR-0001 for why this project addresses skills this way instead of a local id.
+public sealed record SkillDefinition(string Name, string Description, string Body)
+{
+    public string Uri => $"skill://{Name}/SKILL.md";
+}
 
 public static class SkillCatalog
 {
     public static readonly SkillDefinition PrepareDocumentForRag = new(
-        Id: "prepare-document-for-rag",
         Name: "prepare-document-for-rag",
         Description: "Guide an agent through document preparation, chunk creation, and quality checks.",
         Body: """
@@ -33,34 +38,21 @@ public static class SkillCatalog
 
     public static IReadOnlyList<SkillDefinition> All { get; } = [PrepareDocumentForRag];
 
-    static SkillCatalog()
-    {
-        var duplicateIds = All.GroupBy(skill => skill.Id).Where(group => group.Count() > 1).Select(group => group.Key);
-        if (duplicateIds.Any())
-        {
-            throw new InvalidOperationException($"Duplicate skill id(s) in SkillCatalog: {string.Join(", ", duplicateIds)}.");
-        }
-    }
-
-    // Find() assumes ids are unique, enforced above at construction time. That's sufficient
-    // for this hardcoded, single-source catalog, but not a general answer: once skills come
-    // from more than one source, ambiguity needs its own resolution policy (return all
-    // matches, error, or move to SEP-2640-style full-URI addressing). Tracked in #23.
-    public static SkillDefinition? Find(string skillId) =>
-        All.FirstOrDefault(skill => skill.Id == skillId);
+    public static SkillDefinition? Find(string name) =>
+        All.FirstOrDefault(skill => skill.Name == name);
 }
 
-public sealed record SkillCatalogEntry(string Id, string Name, string Description);
+public sealed record SkillCatalogEntry(string Name, string Description, string Uri);
 
 [McpServerResourceType]
 public sealed class SkillResources
 {
     [McpServerResource(UriTemplate = "contextsmith://skills", Name = "Skill catalog")]
-    [Description("List available skills by id, name, and description only (progressive disclosure).")]
+    [Description("List available skills by name, description, and URI only (progressive disclosure).")]
     public static ResourceContents GetCatalog()
     {
         var entries = SkillCatalog.All
-            .Select(skill => new SkillCatalogEntry(skill.Id, skill.Name, skill.Description))
+            .Select(skill => new SkillCatalogEntry(skill.Name, skill.Description, skill.Uri))
             .ToList();
 
         return new TextResourceContents
@@ -71,17 +63,17 @@ public sealed class SkillResources
         };
     }
 
-    [McpServerResource(UriTemplate = "contextsmith://skills/{skillId}", Name = "Skill content")]
+    [McpServerResource(UriTemplate = "skill://{skillName}/SKILL.md", Name = "Skill content")]
     [Description("Return the full body of one skill, for use once the catalog has matched it to the task.")]
     public static ResourceContents GetSkill(
-        [Description("The id of a skill returned by the skill catalog.")] string skillId)
+        [Description("The skill name, matching a name returned by the skill catalog.")] string skillName)
     {
-        var skill = SkillCatalog.Find(skillId)
-            ?? throw new McpException($"No skill is registered under id '{skillId}'.");
+        var skill = SkillCatalog.Find(skillName)
+            ?? throw new McpException($"No skill is registered under name '{skillName}'.");
 
         return new TextResourceContents
         {
-            Uri = $"contextsmith://skills/{skillId}",
+            Uri = skill.Uri,
             MimeType = "text/markdown",
             Text = skill.Body,
         };

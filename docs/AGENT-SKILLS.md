@@ -14,19 +14,19 @@ the repo root.
 - ContextSmith should serve Skills over MCP using **layer 1: MCP-server-native,
   Resources-based** — the direction the industry working group has converged on
   as **SEP-2640**.
-- ContextSmith should **not** build its own addressing scheme for skills. The
-  PoC in this repo (`contextsmith://skills/{skillId}`) used a project-local,
-  bare-id scheme for speed. That choice is now superseded: this repo adopts
-  SEP-2640's full-URI addressing (`skill://<skill-path>/SKILL.md`) instead of
-  maintaining a local variant.
-- This matters because a bare id is ambiguous once skills come from more than
+- ContextSmith does **not** maintain its own addressing scheme for skills. The
+  PoC originally used a project-local, bare-id scheme
+  (`contextsmith://skills/{skillId}`) for speed; that choice was superseded and
+  the PoC now serves skill content under SEP-2640's full-URI addressing
+  (`skill://<skill-path>/SKILL.md`).
+- This mattered because a bare id is ambiguous once skills come from more than
   one source, and a review comment on the PoC (PR #22) caught this. SEP-2640
   avoids the problem structurally, by construction, rather than by validation
   code this project would otherwise have to write and maintain.
 - No other placement layer (agent/client-native, transport-agnostic content
   format) is recommended for build work in this repo at this time.
-- Follow-up work — migrating the PoC's URI scheme to match SEP-2640 — is
-  tracked in #23.
+- See [ADR-0001](adr/0001-skill-resource-addressing.md) for the addressing
+  decision record. Follow-up (#23) is now closed.
 
 ## Responsibilities: Tools, Resources, Prompts, Skills, MCP, Agent, LLM
 
@@ -125,10 +125,11 @@ loaded directly by a layer-2 agent from the same source directory.
 mirroring the existing `[McpServerResourceType]` pattern in
 `DocumentResources.cs`:
 
-- `contextsmith://skills` — catalog resource. Returns name and description
-  only, for cheap progressive disclosure, for every bundled skill.
-- `contextsmith://skills/{skillId}` — content resource. Returns one skill's
-  full body by id.
+- `contextsmith://skills` — catalog resource. Returns name, description, and
+  the skill's `skill://` URI, for cheap progressive disclosure, for every
+  bundled skill.
+- `skill://{skillName}/SKILL.md` — content resource, per SEP-2640's addressing.
+  Returns one skill's full body by name.
 
 The PoC serves one hardcoded sample skill, reusing the `prepare-document-for-rag`
 prompt content as the pilot body. It anticipates the SEP-2640 direction
@@ -136,12 +137,10 @@ prompt content as the pilot body. It anticipates the SEP-2640 direction
 compatibility with the SEP while it is still in Draft status — see Out of
 Scope in #21.
 
-The PoC addresses a skill by a bare `skillId` (`contextsmith://skills/{skillId}`)
-rather than SEP-2640's full-URI addressing (`skill://<skill-path>/SKILL.md`), where
-uniqueness is structural. The catalog validates id uniqueness at construction time as
-a stopgap. See [Conclusion](#addressing-adopt-sep-2640s-scheme-dont-invent-one) — this
-project has decided to migrate to SEP-2640's addressing rather than maintain the local
-scheme; tracked in #23.
+The content resource was originally addressed by a bare, project-local
+`skillId` (`contextsmith://skills/{skillId}`); it now uses SEP-2640's
+`skill://<skill-path>/SKILL.md` addressing instead, where uniqueness is
+structural. See [ADR-0001](adr/0001-skill-resource-addressing.md) for why.
 
 ### Manual verification
 
@@ -150,9 +149,9 @@ pointed at the local `ContextSmith.Mcp` server:
 
 1. `resources/list` includes `contextsmith://skills` alongside the existing
    document-structure resources.
-2. Reading `contextsmith://skills` returns the catalog: the sample skill's id,
-   name, and description, with no full body.
-3. Reading `contextsmith://skills/prepare-document-for-rag` returns the full
+2. Reading `contextsmith://skills` returns the catalog: the sample skill's
+   name, description, and `skill://` URI, with no full body.
+3. Reading `skill://prepare-document-for-rag/SKILL.md` returns the full
    skill body.
 
 ## Conclusion
@@ -177,26 +176,10 @@ ContextSmith owns. Splitting only becomes useful once a shared-library source
 
 ### Addressing: adopt SEP-2640's scheme, don't invent one
 
-The PoC's `contextsmith://skills/{skillId}` addressing was a project-local
-shortcut, chosen to get a working end-to-end resource pair quickly. A PR #22
-review comment identified the cost of that shortcut: a bare id is ambiguous
-the moment two skills share one, and the fix would have been project-specific
-validation code to maintain.
-
-SEP-2640 already solves this, by construction, with full-URI addressing:
-`skill://<skill-path>/SKILL.md`, where `<skill-path>` ends in the skill's
-`name` and any preceding segments are a server-chosen organizational prefix.
-Two skills cannot collide under this scheme without also colliding in name and
-prefix, which is a different, and already-necessary, uniqueness requirement —
-not one this project has to invent or validate separately.
-
-The decision: **adopt SEP-2640's addressing rather than maintain a local
-alternative.** ContextSmith gains nothing by diverging from the public
-standard here, and a divergent scheme is a cost the project would carry alone
-— every future client integration, every future skill source, and every
-future contributor reading this code would need to learn ContextSmith's
-scheme instead of the one the wider ecosystem already uses. Migrating the PoC
-to `skill://` addressing is tracked in #23.
+`SkillResources.cs` addresses skill content by SEP-2640's full URI
+(`skill://<skill-path>/SKILL.md`) rather than a project-local id — see
+[ADR-0001](adr/0001-skill-resource-addressing.md) for the decision and why it
+also does not risk collision with other MCP servers using the same scheme.
 
 ## Follow or contribute
 
