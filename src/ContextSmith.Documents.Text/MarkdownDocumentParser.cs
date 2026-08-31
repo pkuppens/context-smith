@@ -4,8 +4,10 @@ using ContextSmith.Domain;
 
 namespace ContextSmith.Documents.Text;
 
+/// <summary>Parses CommonMark-style Markdown into the common <see cref="Document"/> tree, handling ATX headings, list items, and paragraphs.</summary>
 public sealed partial class MarkdownDocumentParser : IDocumentParser
 {
+    /// <inheritdoc/>
     public async Task<Document> ParseAsync(DocumentSource source, CancellationToken cancellationToken = default)
     {
         using var reader = new StreamReader(source.Content);

@@ -7,9 +7,15 @@ using ModelContextProtocol.Server;
 
 namespace ContextSmith.Mcp;
 
+/// <summary>Exposes a stored document's structure summary as an MCP resource.</summary>
 [McpServerResourceType]
 public sealed class DocumentResources
 {
+    /// <summary>Returns the JSON structure summary for the document stored under <paramref name="documentId"/>.</summary>
+    /// <param name="documentId">The id returned by <c>prepare_document</c>.</param>
+    /// <param name="documentStore">Store the document is read from.</param>
+    /// <returns>The structure summary as a JSON text resource.</returns>
+    /// <exception cref="McpException">No document is stored under <paramref name="documentId"/>.</exception>
     [McpServerResource(UriTemplate = "contextsmith://documents/{documentId}/structure", Name = "Document structure")]
     [Description("Return the canonical hierarchy for one document.")]
     public static ResourceContents GetStructure(

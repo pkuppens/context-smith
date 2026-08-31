@@ -3,6 +3,16 @@ using ContextSmith.Domain;
 
 namespace ContextSmith.Api;
 
+/// <summary>
+/// Orchestrates document preparation and chat: parse a source, chunk it, embed and index the chunks,
+/// then answer questions against the indexed chunks.
+/// </summary>
+/// <param name="parserSelector">Chooses a parser for the source file.</param>
+/// <param name="sourceFetcher">Downloads a document from a URL.</param>
+/// <param name="documentStore">Stores parsed documents.</param>
+/// <param name="embeddingService">Computes embedding vectors for chunk and query text.</param>
+/// <param name="retrievalRegistry">Provides the per-document retrieval service.</param>
+/// <param name="chatClient">Chat model client used to generate answers.</param>
 public sealed class DocumentProcessingService(
     IDocumentParserSelector parserSelector,
     IDocumentSourceFetcher sourceFetcher,
@@ -13,6 +23,11 @@ public sealed class DocumentProcessingService(
 {
     private static readonly IChunkingStrategy Chunker = new StructureAwareChunker();
 
+    /// <summary>Parses an uploaded file, stores it, indexes its chunks, and returns a structure summary.</summary>
+    /// <param name="fileName">Name of the uploaded file. Its extension selects the parser.</param>
+    /// <param name="content">Readable stream of the file content.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>A summary of the prepared document, including the id it is stored under.</returns>
     public async Task<DocumentStructureSummary> PrepareFromUploadAsync(
         string fileName, Stream content, CancellationToken cancellationToken)
     {
@@ -22,6 +37,10 @@ public sealed class DocumentProcessingService(
         return await StoreAndIndexAsync(document, cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>Fetches a URL, parses it as HTML, stores it, indexes its chunks, and returns a structure summary.</summary>
+    /// <param name="url">Absolute <c>http</c> or <c>https</c> URL to fetch.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>A summary of the prepared document, including the id it is stored under.</returns>
     public async Task<DocumentStructureSummary> PrepareFromUrlAsync(Uri url, CancellationToken cancellationToken)
     {
         var source = await sourceFetcher.FetchAsync(url, cancellationToken).ConfigureAwait(false);
@@ -30,6 +49,12 @@ public sealed class DocumentProcessingService(
         return await StoreAndIndexAsync(document, cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>Answers <paramref name="message"/> using the top chunks retrieved for the document.</summary>
+    /// <param name="documentId">Identifier of a prepared document.</param>
+    /// <param name="message">User question.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>The generated answer and the chunks it was grounded on.</returns>
+    /// <exception cref="KeyNotFoundException">No document is indexed under <paramref name="documentId"/>.</exception>
     public async Task<(string Answer, IReadOnlyList<Chunk> Sources)> ChatAsync(
         string documentId, string message, CancellationToken cancellationToken)
     {

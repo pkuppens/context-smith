@@ -10,8 +10,10 @@ using OpenXmlText = DocumentFormat.OpenXml.Wordprocessing.Text;
 
 namespace ContextSmith.Documents.Docx;
 
+/// <summary>Parses Office Open XML (<c>.docx</c>) files into the common <see cref="Document"/> tree.</summary>
 public sealed class DocxDocumentParser : IDocumentParser
 {
+    /// <inheritdoc/>
     public Task<Document> ParseAsync(DocumentSource source, CancellationToken cancellationToken = default)
     {
         using var wordDocument = WordprocessingDocument.Open(source.Content, isEditable: false);

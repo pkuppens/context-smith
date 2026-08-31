@@ -2,8 +2,10 @@ using ContextSmith.Domain;
 
 namespace ContextSmith.Application;
 
+/// <summary>Chunking strategy that emits one chunk per node and carries the enclosing section titles as the heading path.</summary>
 public sealed class StructureAwareChunker : IChunkingStrategy
 {
+    /// <inheritdoc/>
     public IReadOnlyList<Chunk> Chunk(Document document)
     {
         var chunks = new List<Chunk>();

@@ -8,8 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ContextSmith.Mcp;
 
+/// <summary>Registration helpers for the ContextSmith MCP server services.</summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>Registers the document store and parser selector from configuration.</summary>
+    /// <param name="services">Service collection to add to.</param>
+    /// <param name="configuration">Configuration that selects providers (for example <c>Storage:Provider</c>).</param>
+    /// <returns>The same <paramref name="services"/> instance, for chaining.</returns>
     public static IServiceCollection AddContextSmithApplication(this IServiceCollection services, IConfiguration configuration)
     {
         var storageProvider = configuration["Storage:Provider"] ?? "InMemory";

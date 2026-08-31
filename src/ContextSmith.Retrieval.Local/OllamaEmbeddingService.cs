@@ -4,8 +4,13 @@ using ContextSmith.Application;
 
 namespace ContextSmith.Retrieval.Local;
 
+/// <summary><see cref="IEmbeddingService"/> that calls a local Ollama server's <c>api/embeddings</c> endpoint.</summary>
+/// <param name="httpClient">Client pointed at the Ollama base address.</param>
+/// <param name="model">Ollama embedding model name.</param>
 public sealed class OllamaEmbeddingService(HttpClient httpClient, string model = "nomic-embed-text") : IEmbeddingService
 {
+    /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">Ollama returned no embedding.</exception>
     public async Task<float[]> EmbedAsync(string text, CancellationToken cancellationToken = default)
     {
         var response = await httpClient

@@ -8,8 +8,13 @@ using ContextSmith.Retrieval.Local;
 
 namespace ContextSmith.Api;
 
+/// <summary>Registration helpers for the ContextSmith API services.</summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>Registers the document store, parsers, embedding and retrieval services, and chat client from configuration.</summary>
+    /// <param name="services">Service collection to add to.</param>
+    /// <param name="configuration">Configuration that selects providers (for example <c>Storage:Provider</c>, <c>Embedding:Provider</c>, <c>Retrieval:Provider</c>).</param>
+    /// <returns>The same <paramref name="services"/> instance, for chaining.</returns>
     public static IServiceCollection AddContextSmithApi(this IServiceCollection services, IConfiguration configuration)
     {
         var storageProvider = configuration["Storage:Provider"] ?? "InMemory";

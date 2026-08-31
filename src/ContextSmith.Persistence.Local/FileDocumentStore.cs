@@ -4,10 +4,13 @@ using ContextSmith.Domain;
 
 namespace ContextSmith.Persistence.Local;
 
+/// <summary><see cref="IDocumentStore"/> that persists each document as a JSON file under <c>documents/</c> in a root directory.</summary>
+/// <param name="rootDirectory">Directory that holds the <c>documents/</c> folder.</param>
 public sealed class FileDocumentStore(string rootDirectory) : IDocumentStore
 {
     private readonly string _documentsDirectory = Path.Combine(rootDirectory, "documents");
 
+    /// <inheritdoc/>
     public string Store(Document document, string? documentId = null)
     {
         var id = documentId ?? Guid.NewGuid().ToString("n");
@@ -16,6 +19,7 @@ public sealed class FileDocumentStore(string rootDirectory) : IDocumentStore
         return id;
     }
 
+    /// <inheritdoc/>
     public Document? Get(string documentId)
     {
         var path = PathFor(documentId);
