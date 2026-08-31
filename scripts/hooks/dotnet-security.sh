@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if ! ls ./*.sln >/dev/null 2>&1; then
-  echo "dotnet-vulnerable-packages: no .sln file yet, skipping (see docs/PLAN.md Step 1)."
-  exit 0
-fi
-
 output=$(dotnet list package --vulnerable --include-transitive 2>&1)
 echo "$output"
 
