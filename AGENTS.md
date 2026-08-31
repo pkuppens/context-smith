@@ -16,11 +16,19 @@ they add information beyond the name). On an interface implementation, use
 `<inheritdoc/>` instead of repeating the interface's doc comment, so the two
 cannot drift.
 
-`Directory.Build.props` enables `GenerateDocumentationFile`, so a missing
-doc comment on a public member in `src/` shows up as a `CS1591` build
-warning. Test projects (`tests/`) are exempt. The existing gap and the plan
-to promote `CS1591` to a build error are tracked in
-[#26](https://github.com/pkuppens/context-smith/issues/26).
+`Directory.Build.props` enables `GenerateDocumentationFile` and `.editorconfig`
+promotes `CS1591` to an error, so a missing doc comment on a public type or
+member in `src/` fails the build. `pre-commit` (the `dotnet-build` hook) and CI
+both enforce this.
+
+Test projects (`tests/`) opt out of the `CS1591` build error through
+`<NoWarn>$(NoWarn);CS1591</NoWarn>` in `Directory.Build.props`: xUnit types and
+methods are all public, and a `<summary>` that restates a `Method_Scenario_Expected`
+test name adds nothing. The opt-out is not a licence to skip readability. Shared
+test infrastructure — fixtures, data builders, custom assertions, anything reused
+across test classes — still gets a `<summary>` or at least a `//` comment on
+intent. A test that encodes a non-obvious rule or pins a regression gets a short
+`//` comment, or a reason string on `Skip` or `DisplayName`.
 
 ## Agent skills
 
