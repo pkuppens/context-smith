@@ -24,24 +24,32 @@ repos:
     hooks:
       - id: dotnet-format
         name: dotnet format (verify)
-        description: Fail if C# source is not formatted. Skips until a solution exists (docs/PLAN.md Step 1).
+        description: Fail if C# source is not formatted.
         entry: scripts/hooks/dotnet-format.sh
         language: script
         files: \.(cs|csproj|props)$
         pass_filenames: false
 
+      - id: dotnet-build
+        name: dotnet build
+        description: Fail the build on any compiler error, including CS1591 (missing XML doc comment on a public API in src/).
+        entry: scripts/hooks/dotnet-build.sh
+        language: script
+        files: \.(cs|csproj|props|slnx?|editorconfig)$
+        pass_filenames: false
+
       - id: dotnet-test
         name: dotnet test
-        description: Run the unit test suite. Skips until a solution exists (docs/PLAN.md Step 1).
+        description: Run the unit test suite.
         entry: scripts/hooks/dotnet-test.sh
         language: script
-        files: \.(cs|csproj|sln)$
+        files: \.(cs|csproj|slnx?)$
         pass_filenames: false
 
       - id: dotnet-vulnerable-packages
         name: dotnet list package --vulnerable
-        description: Fail if a referenced NuGet package has a known vulnerability. Skips until a solution exists (docs/PLAN.md Step 1).
+        description: Fail if a referenced NuGet package has a known vulnerability.
         entry: scripts/hooks/dotnet-security.sh
         language: script
-        files: \.(csproj|props|sln)$
+        files: \.(csproj|props|slnx?)$
         pass_filenames: false
