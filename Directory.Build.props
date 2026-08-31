@@ -6,5 +6,12 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Surfaces CS1591 (missing XML doc comment) for public APIs in src/, so IDEs and agents
+         see gaps as warnings. Test projects are exempt (see below) since test methods don't
+         need XML docs. Tracked in #26 to backfill the existing gap and promote to an error. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(MSBuildProjectDirectory.Contains('\tests\')) Or $(MSBuildProjectDirectory.Contains('/tests/'))">
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 </Project>
