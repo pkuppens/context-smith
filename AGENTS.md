@@ -8,6 +8,20 @@ Write in ASD-STE100 Simplified Technical English (STE): short sentences, one ins
 
 Terms or abbreviations outside STE (domain jargon, product names, acronyms) must be introduced with a definition in the domain docs — see `docs/agents/domain.md`.
 
+## C# code style
+
+Follow `.editorconfig`. Give every public type and member an XML doc comment
+(`<summary>` at minimum; add `<param>`, `<returns>`, and `<exception>` where
+they add information beyond the name). On an interface implementation, use
+`<inheritdoc/>` instead of repeating the interface's doc comment, so the two
+cannot drift.
+
+`Directory.Build.props` enables `GenerateDocumentationFile`, so a missing
+doc comment on a public member in `src/` shows up as a `CS1591` build
+warning. Test projects (`tests/`) are exempt. The existing gap and the plan
+to promote `CS1591` to a build error are tracked in
+[#26](https://github.com/pkuppens/context-smith/issues/26).
+
 ## Agent skills
 
 ### Issue tracker

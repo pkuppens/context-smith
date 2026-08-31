@@ -177,6 +177,16 @@ unset it defaults to following `Storage:Provider`, preserving the original
 `InMemory`/`File` behavior. `InMemory`, `File`, and `AzureSearch` are the
 implemented `Retrieval:Provider` values.
 
+`AzureAiSearchRetrievalService` does not match a vector to a chunk as a
+separate step. It stores each chunk's text and provenance metadata as
+[fields on the same search document as the chunk's vector field][azure-search-vectors].
+Azure AI Search's vector query returns matching documents directly, so the
+chunk data returns with no extra lookup. `InMemoryRetrievalService` and
+`FileRetrievalService` use the same one-document-per-chunk shape for the
+same reason.
+
+[azure-search-vectors]: https://learn.microsoft.com/azure/search/vector-search-overview
+
 A test can compare combinations of chunking strategies and embedding models.
 
 Possible retrieval metrics include:
@@ -238,6 +248,12 @@ index instead.
 Configuration selects the active backend at startup through `Storage:Provider`
 (`InMemory` or `File` today). Adding a database backend means adding one more
 case to this switch, not changing the interfaces or their callers.
+
+A database that supports vectors natively (PostgreSQL with `pgvector`,
+MongoDB, or Supabase) could implement both `IDocumentStore` and
+`IRetrievalService`, replacing the separate `Retrieval:Provider` axis with a
+single store for documents, chunks, and embeddings. This is tracked as
+future work in [#25](https://github.com/pkuppens/context-smith/issues/25).
 
 ## Relationship with Azure
 
