@@ -4,12 +4,16 @@ using ContextSmith.Application;
 
 namespace ContextSmith.Persistence.Local;
 
+/// <summary><see cref="IRetrievalService"/> that keeps a per-document vector index and persists it as a JSON file under <c>retrieval/</c>.</summary>
 public sealed class FileRetrievalService : IRetrievalService
 {
     private readonly string _indexDirectory;
     private readonly string _indexPath;
     private readonly ConcurrentDictionary<string, IndexEntry> _index;
 
+    /// <summary>Loads the index for <paramref name="documentId"/> from disk, or starts an empty one.</summary>
+    /// <param name="rootDirectory">Directory that holds the <c>retrieval/</c> folder.</param>
+    /// <param name="documentId">Document whose index this service manages.</param>
     public FileRetrievalService(string rootDirectory, string documentId)
     {
         _indexDirectory = Path.Combine(rootDirectory, "retrieval");
@@ -22,6 +26,7 @@ public sealed class FileRetrievalService : IRetrievalService
         _index = new ConcurrentDictionary<string, IndexEntry>(entries.ToDictionary(entry => entry.Chunk.Id));
     }
 
+    /// <inheritdoc/>
     public Task IndexAsync(Chunk chunk, float[] embedding, CancellationToken cancellationToken = default)
     {
         _index[chunk.Id] = new IndexEntry(chunk, embedding);
@@ -29,6 +34,7 @@ public sealed class FileRetrievalService : IRetrievalService
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public Task<IReadOnlyList<Chunk>> SearchAsync(float[] queryEmbedding, int topK, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<Chunk> results = _index.Values

@@ -8,8 +8,10 @@ using Azure.Search.Documents.Models;
 
 namespace ContextSmith.Retrieval.Azure;
 
+/// <summary><see cref="IAzureSearchGateway"/> that talks to a real Azure AI Search service through the Azure SDK.</summary>
 public sealed class AzureSearchGateway : IAzureSearchGateway
 {
+    /// <summary>Name of the vector field in the search index.</summary>
     public const string VectorFieldName = "vector";
     private const string VectorSearchProfileName = "contextsmith-hnsw-profile";
     private const string VectorSearchAlgorithmName = "contextsmith-hnsw";
@@ -19,6 +21,10 @@ public sealed class AzureSearchGateway : IAzureSearchGateway
     private readonly string _indexName;
     private bool _indexEnsured;
 
+    /// <summary>Creates a gateway for one Azure AI Search index.</summary>
+    /// <param name="endpoint">Azure AI Search service endpoint.</param>
+    /// <param name="indexName">Name of the index this gateway reads and writes.</param>
+    /// <param name="apiKey">Admin API key, or <see langword="null"/> to authenticate with a managed identity.</param>
     public AzureSearchGateway(Uri endpoint, string indexName, string? apiKey = null)
     {
         _indexName = indexName;
@@ -37,6 +43,7 @@ public sealed class AzureSearchGateway : IAzureSearchGateway
         }
     }
 
+    /// <inheritdoc/>
     public async Task EnsureIndexAsync(int vectorDimension, CancellationToken cancellationToken)
     {
         if (_indexEnsured)
@@ -71,9 +78,11 @@ public sealed class AzureSearchGateway : IAzureSearchGateway
         _indexEnsured = true;
     }
 
+    /// <inheritdoc/>
     public async Task MergeOrUploadAsync(SearchDocument document, CancellationToken cancellationToken) =>
         await _searchClient.MergeOrUploadDocumentsAsync([document], cancellationToken: cancellationToken).ConfigureAwait(false);
 
+    /// <inheritdoc/>
     public async Task<IReadOnlyList<SearchDocument>> VectorSearchAsync(float[] queryEmbedding, int topK, CancellationToken cancellationToken)
     {
         var options = new SearchOptions

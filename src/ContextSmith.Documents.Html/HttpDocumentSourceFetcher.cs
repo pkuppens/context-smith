@@ -2,8 +2,12 @@ using ContextSmith.Application;
 
 namespace ContextSmith.Documents.Html;
 
+/// <summary>Fetches <c>http</c> and <c>https</c> documents with an <see cref="HttpClient"/>.</summary>
+/// <param name="httpClient">Client used for the download.</param>
 public sealed class HttpDocumentSourceFetcher(HttpClient httpClient) : IDocumentSourceFetcher
 {
+    /// <inheritdoc/>
+    /// <exception cref="NotSupportedException">The URL scheme is not <c>http</c> or <c>https</c>.</exception>
     public async Task<DocumentSource> FetchAsync(Uri url, CancellationToken cancellationToken = default)
     {
         if (url.Scheme is not ("http" or "https"))

@@ -3,16 +3,19 @@ using ContextSmith.Application;
 
 namespace ContextSmith.Retrieval.Local;
 
+/// <summary>Process-lifetime <see cref="IRetrievalService"/> that holds chunk embeddings in memory and ranks them by cosine similarity.</summary>
 public sealed class InMemoryRetrievalService : IRetrievalService
 {
     private readonly ConcurrentDictionary<string, (Chunk Chunk, float[] Embedding)> _index = new();
 
+    /// <inheritdoc/>
     public Task IndexAsync(Chunk chunk, float[] embedding, CancellationToken cancellationToken = default)
     {
         _index[chunk.Id] = (chunk, embedding);
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public Task<IReadOnlyList<Chunk>> SearchAsync(float[] queryEmbedding, int topK, CancellationToken cancellationToken = default)
     {
         IReadOnlyList<Chunk> results = _index.Values

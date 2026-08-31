@@ -2,8 +2,13 @@ using ContextSmith.Domain;
 
 namespace ContextSmith.Application;
 
+/// <summary>Builds a <see cref="DocumentStructureSummary"/> from a parsed <see cref="Document"/>.</summary>
 public static class DocumentStructureSummaryBuilder
 {
+    /// <summary>Counts the section, heading, and paragraph nodes in <paramref name="document"/> and builds its outline tree.</summary>
+    /// <param name="documentId">Identifier to record on the returned summary.</param>
+    /// <param name="document">Parsed document to summarise.</param>
+    /// <returns>A summary of <paramref name="document"/>.</returns>
     public static DocumentStructureSummary Build(string documentId, Document document)
     {
         var outline = BuildOutline(document, level: 0);

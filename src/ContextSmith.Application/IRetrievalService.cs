@@ -1,5 +1,6 @@
 namespace ContextSmith.Application;
 
+/// <summary>Indexes chunk embeddings and answers nearest-neighbour queries over them.</summary>
 public interface IRetrievalService
 {
     /// <summary>

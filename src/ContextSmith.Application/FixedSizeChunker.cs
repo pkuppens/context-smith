@@ -2,8 +2,11 @@ using ContextSmith.Domain;
 
 namespace ContextSmith.Application;
 
+/// <summary>Chunking strategy that packs leaf text into chunks of a fixed maximum size, ignoring structure.</summary>
+/// <param name="maxCharacters">Soft upper bound on chunk length in characters. A single leaf longer than this is still emitted whole.</param>
 public sealed class FixedSizeChunker(int maxCharacters = 500) : IChunkingStrategy
 {
+    /// <inheritdoc/>
     public IReadOnlyList<Chunk> Chunk(Document document)
     {
         var chunks = new List<Chunk>();

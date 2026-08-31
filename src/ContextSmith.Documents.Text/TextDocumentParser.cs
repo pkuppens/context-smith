@@ -3,8 +3,10 @@ using ContextSmith.Domain;
 
 namespace ContextSmith.Documents.Text;
 
+/// <summary>Parses plain text into the common <see cref="Document"/> tree, treating blank-line-separated blocks as paragraphs.</summary>
 public sealed class TextDocumentParser : IDocumentParser
 {
+    /// <inheritdoc/>
     public async Task<Document> ParseAsync(DocumentSource source, CancellationToken cancellationToken = default)
     {
         using var reader = new StreamReader(source.Content);

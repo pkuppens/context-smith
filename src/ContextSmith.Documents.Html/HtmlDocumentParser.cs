@@ -6,6 +6,7 @@ using Document = ContextSmith.Domain.Document;
 
 namespace ContextSmith.Documents.Html;
 
+/// <summary>Parses HTML into the common <see cref="Document"/> tree, flattening layout containers and keeping headings, paragraphs, lists, and tables.</summary>
 public sealed class HtmlDocumentParser : IDocumentParser
 {
     private static readonly HashSet<string> TransparentContainers = new(StringComparer.OrdinalIgnoreCase)
@@ -13,6 +14,7 @@ public sealed class HtmlDocumentParser : IDocumentParser
         "html", "body", "div", "section", "article", "main", "header", "footer", "nav", "span",
     };
 
+    /// <inheritdoc/>
     public async Task<Document> ParseAsync(DocumentSource source, CancellationToken cancellationToken = default)
     {
         using var reader = new StreamReader(source.Content);
