@@ -699,37 +699,55 @@ same application contracts as local development.
 
 Issue: [#10](https://github.com/pkuppens/context-smith/issues/10)
 
+**Status: done.**
+
 **Goal.** Compare parsing, chunking, embedding, and retrieval choices with
 repeatable test data.
 
 **Acceptance criteria**
 
-- [ ] An evaluation dataset exists under `samples/documents/`, with fixture
+- [x] An evaluation dataset exists under `samples/documents/`, with fixture
       documents, queries, and relevance judgments.
-- [ ] An evaluation harness computes Recall@K, Mean Reciprocal Rank (MRR),
+- [x] An evaluation harness computes Recall@K, Mean Reciprocal Rank (MRR),
       and normalized Discounted Cumulative Gain (nDCG) for one strategy
       combination.
-- [ ] Running the harness against at least two chunking strategies produces
+- [x] Running the harness against at least two chunking strategies produces
       a comparison report.
 
 **Steps**
 
-- [ ] 1. Curate the evaluation dataset under `samples/documents/`: fixture
+- [x] 1. Curate the evaluation dataset under `samples/documents/`: fixture
       documents, a fixed set of queries, and manually judged relevant
       chunks per query.
-- [ ] 2. Implement Recall@K, MRR, and nDCG. Put them in
+- [x] 2. Implement Recall@K, MRR, and nDCG. Put them in
       `ContextSmith.Application`, or in a new `ContextSmith.Evaluation`
       project if the metrics don't belong in the application layer —
       decide while implementing.
-- [ ] 3. Add a command (console entry point or a dedicated test) that runs
+- [x] 3. Add a command (console entry point or a dedicated test) that runs
       the comparison across at least two chunking strategies and writes a
       report (CSV or console table) with the metric values.
 
 **Validation**
 
-- [ ] Running the evaluation command produces a report file.
-- [ ] A test asserts that the report file exists and that each metric
+- [x] Running the evaluation command produces a report file.
+- [x] A test asserts that the report file exists and that each metric
       value is between 0 and 1.
+
+**As built.** New project `ContextSmith.Evaluation` (console app). Run it with:
+
+```bash
+dotnet run --project src/ContextSmith.Evaluation -- samples/documents/evaluation evaluation-report.csv 3
+```
+
+The dataset in `samples/documents/evaluation/` holds three Markdown documents and
+ten queries in `queries.json`. A judgment is a list of key phrases, not chunk ids:
+a chunk is relevant when its text contains one of them, so the same judgments work
+for every chunking strategy. Embeddings come from `HashingEmbeddingService`, an
+offline bag-of-words hash, so runs repeat exactly. First baseline (k = 3):
+fixed-size-300 recall 0.800 / MRR 0.750 / nDCG 0.763; structure-aware recall 0.800 /
+MRR 0.733 / nDCG 0.750. The dataset is small and the embedding is lexical, so read
+these numbers as a working harness, not as a verdict on either strategy. Swap in a
+real embedding model (Ollama or Azure OpenAI) to compare embeddings.
 
 ### Step 11 — Additional Office formats
 
@@ -856,9 +874,9 @@ See the issue for full acceptance criteria, steps, and validation.
 
 ContextSmith is under active development.
 
-Steps 1-8 and 11-15 are done: a working local demo (`docs/DEMO.md`) that
+Steps 1-8 and 10-15 are done: a working local demo (`docs/DEMO.md`) that
 uploads or fetches a document (txt/md/docx/html/xlsx/pptx, PDF when Azure
 Document Intelligence is configured, or any http(s) URL), parses it into the
 canonical model, chunks it, embeds and indexes the chunks (Ollama or Azure
 OpenAI; in-memory, file, or Azure AI Search), and answers grounded questions
-through an Angular UI. Steps 9 and 10 (deployment and evaluation) remain.
+through an Angular UI. Step 9 (deployment) remains.

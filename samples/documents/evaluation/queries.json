@@ -1,0 +1,12 @@
+[
+  { "id": "parental-eligibility", "text": "When do employees qualify for parental leave?", "keyPhrases": ["after twelve months of employment"] },
+  { "id": "parental-duration", "text": "How long does parental leave last and what is it paid at?", "keyPhrases": ["up to 26 weeks"] },
+  { "id": "sick-report", "text": "Who must I tell when I am ill and by what time?", "keyPhrases": ["report sick leave to their manager"] },
+  { "id": "pension", "text": "How large is the pension contribution?", "keyPhrases": ["five percent of gross salary"] },
+  { "id": "expense-deadline", "text": "How many days do I have to submit expense claims?", "keyPhrases": ["within thirty days"] },
+  { "id": "password-length", "text": "How long must a password be?", "keyPhrases": ["at least fourteen characters"] },
+  { "id": "lost-device", "text": "What do I do when I lose my laptop?", "keyPhrases": ["within one hour"] },
+  { "id": "phishing", "text": "How do I report a phishing email?", "keyPhrases": ["report button in the mail client"] },
+  { "id": "flight-class", "text": "Which flight class is standard for short flights?", "keyPhrases": ["Economy class is standard"] },
+  { "id": "meal-allowance", "text": "What is the daily meal allowance for trips in the country?", "keyPhrases": ["forty euros"] }
+]
