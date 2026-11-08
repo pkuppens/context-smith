@@ -9,6 +9,7 @@ namespace ContextSmith.Domain;
 [JsonDerivedType(typeof(Heading), "heading")]
 [JsonDerivedType(typeof(Paragraph), "paragraph")]
 [JsonDerivedType(typeof(ListBlock), "listBlock")]
+[JsonDerivedType(typeof(TableBlock), "tableBlock")]
 public abstract class DocumentNode
 {
     /// <summary>Origin of this node in the source document.</summary>
