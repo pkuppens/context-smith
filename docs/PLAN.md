@@ -420,24 +420,26 @@ Issue: [#4](https://github.com/pkuppens/context-smith/issues/4)
 
 Issue: [#5](https://github.com/pkuppens/context-smith/issues/5)
 
+**Status: done**, except the credentialed integration run (see below).
+
 **Goal.** Parse `.pdf` files, with Azure Document Intelligence as the first
 implementation.
 
 **Acceptance criteria**
 
-- [ ] An `IDocumentParser` implementation for PDF exists in a new
+- [x] An `IDocumentParser` implementation for PDF exists in a new
       `ContextSmith.Documents.Pdf` project.
-- [ ] The implementation reads Azure credentials and endpoint from
+- [x] The implementation reads Azure credentials and endpoint from
       configuration (`IConfiguration`), not from source code.
-- [ ] A unit test verifies the parser contract with a mocked Azure
+- [x] A unit test verifies the parser contract with a mocked Azure
       response.
-- [ ] An optional integration test, marked as requiring Azure credentials,
+- [x] An optional integration test, marked as requiring Azure credentials,
       runs against a fixture `.pdf` file when credentials are present, and
       is skipped (not failed) when they are absent.
 
 **Steps**
 
-- [ ] 1. Create the project and test project, and add the Azure Document
+- [x] 1. Create the project and test project, and add the Azure Document
       Intelligence package:
 
       ```bash
@@ -454,24 +456,32 @@ implementation.
       `Directory.Packages.props` as a `<PackageVersion>`, and drop the
       `Version` attribute from the `<PackageReference>` — see the Step 1
       note on central package management.
-- [ ] 2. Implement `PdfDocumentParser : IDocumentParser`, reading the
+- [x] 2. Implement `PdfDocumentParser : IDocumentParser`, reading the
       endpoint and key from `IConfiguration`.
-- [ ] 3. Add a unit test that injects a mocked Document Intelligence
+- [x] 3. Add a unit test that injects a mocked Document Intelligence
       client (wrap the SDK client behind a small interface if it is not
       directly mockable) and asserts the mapping from Azure's layout
       result to the canonical model.
-- [ ] 4. Add an integration test that is skipped when an environment
+- [x] 4. Add an integration test that is skipped when an environment
       variable such as `AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT` is unset,
       and otherwise runs the real parser against a fixture `.pdf`.
 
 **Validation**
 
-- [ ] `dotnet build` succeeds.
-- [ ] `dotnet test --filter ContextSmith.Documents.Pdf.Tests` passes
+- [x] `dotnet build` succeeds.
+- [x] `dotnet test --filter ContextSmith.Documents.Pdf.Tests` passes
       without Azure credentials present (the integration test reports
       Skipped, not Failed).
-- [ ] The integration test passes when Azure credentials are present.
-- [ ] `pre-commit run --all-files` passes.
+- [ ] The integration test passes when Azure credentials are present. Not run yet: no
+      Azure resource was available when this step was built. Run it with
+      `AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT` set.
+- [x] `pre-commit run --all-files` passes.
+
+**As built.** `PdfDocumentParser` depends on `IDocumentIntelligenceGateway`; a fake
+gateway drives the unit tests. `DocumentIntelligenceLayoutMapper` orders
+paragraphs and tables by text offset and drops table-cell paragraphs. Roles
+`title` and `sectionHeading` open nested sections; page headers, footers,
+page numbers, and footnotes are dropped.
 
 ### Step 6 — Chunk strategies
 
@@ -834,11 +844,11 @@ See the issue for full acceptance criteria, steps, and validation.
 
 ContextSmith is under active development.
 
-Steps 1-4, 6, 7, and 12-14 are done — a working local demo (`docs/DEMO.md`):
+Steps 1-4, 5, 6, 7, and 12-14 are done — a working local demo (`docs/DEMO.md`):
 upload or fetch a document (txt/md/docx/html, or any http(s) URL), parse it
 into the canonical model, chunk it, embed and index the chunks locally with
 Ollama, and ask grounded questions about it through an Angular UI, with the
 MCP server's own prompts offered as sample prompts. Step 15 (DI-selectable
-persistence) is next, ahead of Steps 5, 8, 9, 10, 11 (Azure-backed PDF,
+persistence) is next, ahead of Steps 8, 9, 10, 11 (Azure-backed
 embeddings, deployment, evaluation, and additional Office formats), which
 stay on the roadmap for when Azure credentials are available.

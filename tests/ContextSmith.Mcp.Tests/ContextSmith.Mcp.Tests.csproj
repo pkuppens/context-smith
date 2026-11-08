@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ContextSmith.Mcp\ContextSmith.Mcp.csproj" />
+    <ProjectReference Include="..\..\src\ContextSmith.Documents.Pdf\ContextSmith.Documents.Pdf.csproj" />
   </ItemGroup>
 
   <ItemGroup>
