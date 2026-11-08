@@ -64,13 +64,8 @@ The first document phase includes these formats.
 | Word | `.docx` | Read source structure with Open XML and optional managed services. |
 | HTML | `.html`, `.htm`, or a fetched `http(s)` URL | Parse HTML structure (headings, lists, tables). A URL is fetched over HTTP(S) — no other scheme is accepted — then parsed the same way as an uploaded HTML file. |
 | PDF | `.pdf` | Read text and layout with Azure Document Intelligence (`prebuilt-layout`). Enabled when `DocumentIntelligence:Endpoint` is set; `DocumentIntelligence:ApiKey` is optional, and managed identity is used without it. |
-
-Later phases can add these formats.
-
-| Format | Extension | Planned use |
-| --- | --- | --- |
-| Excel | `.xlsx` | Convert workbooks, sheets, tables, and ranges into semantic document structures. |
-| PowerPoint | `.pptx` | Convert slides, titles, text blocks, notes, and tables into semantic document structures. |
+| Excel | `.xlsx` | One section per sheet. The used range becomes one table. |
+| PowerPoint | `.pptx` | One section per slide. Titles, text blocks, tables, and speaker notes map to headings, paragraphs, tables, and notes paragraphs. |
 
 The canonical model must not depend on a source file type.
 

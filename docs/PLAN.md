@@ -735,21 +735,23 @@ repeatable test data.
 
 Issue: [#11](https://github.com/pkuppens/context-smith/issues/11)
 
+**Status: done.**
+
 **Goal.** Add Excel and PowerPoint parsing after the canonical model and
 evaluation approach are stable.
 
 **Acceptance criteria**
 
-- [ ] An `IDocumentParser` implementation for `.xlsx` maps sheets, tables,
+- [x] An `IDocumentParser` implementation for `.xlsx` maps sheets, tables,
       and ranges to the canonical model.
-- [ ] An `IDocumentParser` implementation for `.pptx` maps slides, text
+- [x] An `IDocumentParser` implementation for `.pptx` maps slides, text
       blocks, notes, and tables to the canonical model.
-- [ ] Fixture-based tests validate the structural mapping for both
+- [x] Fixture-based tests validate the structural mapping for both
       formats.
 
 **Steps**
 
-- [ ] 1. Create both projects and their test projects, following the same
+- [x] 1. Create both projects and their test projects, following the same
       pattern as Steps 3-5:
 
       ```bash
@@ -764,19 +766,29 @@ evaluation approach are stable.
       dotnet add tests/ContextSmith.Documents.PowerPoint.Tests reference src/ContextSmith.Documents.PowerPoint
       ```
 
-- [ ] 2. Implement `ExcelDocumentParser` (sheets → `Section`, tables/ranges
+- [x] 2. Implement `ExcelDocumentParser` (sheets → `Section`, tables/ranges
       → `TableBlock`) and `PowerPointDocumentParser` (slides → `Section`,
       titles → `Heading`, text blocks → `Paragraph`, notes → metadata,
       tables → `TableBlock`) with the Open XML SDK.
-- [ ] 3. Add fixture `.xlsx`/`.pptx` files and unit tests validating the
+- [x] 3. Add fixture `.xlsx`/`.pptx` files and unit tests validating the
       structural mapping for both formats.
 
 **Validation**
 
-- [ ] `dotnet build` succeeds.
-- [ ] `dotnet test --filter "FullyQualifiedName~Excel|FullyQualifiedName~PowerPoint"`
+- [x] `dotnet build` succeeds.
+- [x] `dotnet test --filter "FullyQualifiedName~Excel|FullyQualifiedName~PowerPoint"`
       passes.
-- [ ] `pre-commit run --all-files` passes.
+- [x] `pre-commit run --all-files` passes.
+
+**As built.** Excel: one `Section` per sheet (heading plus one `TableBlock` for the
+used range, gaps padded, shared strings and cached formula values read; an empty
+sheet keeps its section). PowerPoint: one `Section` per slide (title placeholder
+becomes the `Heading`; an untitled slide is named `Slide N`; speaker notes become a
+`Paragraph` with location `slide-N/notes`, because `DocumentMetadata` holds only a
+title). Test fixtures are built in code with the Open XML SDK; `sample.xlsx` and
+`sample.pptx` are committed for the demo. Also fixed: `TableBlock` was missing from
+`DocumentNode`'s polymorphic JSON types, so the file store could not save any
+document with a table.
 
 ## Demo track
 
@@ -844,11 +856,9 @@ See the issue for full acceptance criteria, steps, and validation.
 
 ContextSmith is under active development.
 
-Steps 1-4, 5, 6, 7, and 12-14 are done — a working local demo (`docs/DEMO.md`):
-upload or fetch a document (txt/md/docx/html, or any http(s) URL), parse it
-into the canonical model, chunk it, embed and index the chunks locally with
-Ollama, and ask grounded questions about it through an Angular UI, with the
-MCP server's own prompts offered as sample prompts. Step 15 (DI-selectable
-persistence) is next, ahead of Steps 8, 9, 10, 11 (Azure-backed
-embeddings, deployment, evaluation, and additional Office formats), which
-stay on the roadmap for when Azure credentials are available.
+Steps 1-8 and 11-15 are done: a working local demo (`docs/DEMO.md`) that
+uploads or fetches a document (txt/md/docx/html/xlsx/pptx, PDF when Azure
+Document Intelligence is configured, or any http(s) URL), parses it into the
+canonical model, chunks it, embeds and indexes the chunks (Ollama or Azure
+OpenAI; in-memory, file, or Azure AI Search), and answers grounded questions
+through an Angular UI. Steps 9 and 10 (deployment and evaluation) remain.

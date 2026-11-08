@@ -1,5 +1,7 @@
 using ContextSmith.Application;
+using ContextSmith.Documents.Excel;
 using ContextSmith.Documents.Pdf;
+using ContextSmith.Documents.PowerPoint;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,5 +31,14 @@ public class ParserRegistrationTests
         var selector = BuildSelector([]);
 
         Assert.Throws<NotSupportedException>(() => selector.GetParser("handbook.pdf"));
+    }
+
+    [Fact]
+    public void Excel_and_PowerPoint_parsers_are_registered_by_default()
+    {
+        var selector = BuildSelector([]);
+
+        Assert.IsType<ExcelDocumentParser>(selector.GetParser("plans.xlsx"));
+        Assert.IsType<PowerPointDocumentParser>(selector.GetParser("onboarding.pptx"));
     }
 }
