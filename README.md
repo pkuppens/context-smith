@@ -149,3 +149,15 @@ dotnet test tests/ContextSmith.Persistence.Postgres.Tests   # integration tests 
 ```
 
 `Postgres:VectorDimension` (default 768) must match the embedding model. See `docs/ARCHITECTURE.md`, Persistence.
+
+## MCP server over HTTP and in a container
+
+The MCP server talks over stdio by default. Set `Mcp:Transport=Http` (or the environment variable `Mcp__Transport=Http`) to serve MCP over streamable HTTP at `/mcp`, with a health check at `/health`. The container image uses HTTP mode and listens on port 8080.
+
+```bash
+docker build -t contextsmith-mcp .
+docker run -d -p 8080:8080 contextsmith-mcp
+bash scripts/smoke-test.sh http://localhost:8080   # exit code 0 when /health answers 200
+```
+
+Configuration values (providers, endpoints, connection strings) come in as environment variables, for example `Storage__Provider=Postgres`. Nothing in the image is tied to one cloud. Hosting it on a particular platform is a separate step (see `docs/PLAN.md`, Step 9).

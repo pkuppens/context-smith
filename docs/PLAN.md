@@ -664,6 +664,10 @@ implementation targets that shape directly.
 
 Issue: [#9](https://github.com/pkuppens/context-smith/issues/9)
 
+**Status: partly done.** The portable parts are built: HTTP transport, `/health`,
+`Dockerfile`, and `scripts/smoke-test.sh`. Azure infrastructure-as-code and the deployment
+are deliberately left open (see below).
+
 **Goal.** Deploy the MCP server and required services to Azure, using the
 same application contracts as local development.
 
@@ -672,7 +676,7 @@ same application contracts as local development.
 - [ ] Infrastructure-as-code (Bicep or `azd`) provisions Azure Container
       Apps, Azure Document Intelligence, Azure OpenAI, Azure AI Search, and
       a managed identity.
-- [ ] The deployed MCP server responds to a health check endpoint.
+- [x] The MCP server responds to a health check endpoint (checked locally in a container; not yet on Azure).
 - [ ] No application code changes between local and Azure deployment;
       configuration values differ only.
 
@@ -681,7 +685,7 @@ same application contracts as local development.
 - [ ] 1. Run `azd init` (or hand-write Bicep under `infra/`) to provision
       Azure Container Apps, Azure Document Intelligence, Azure OpenAI,
       Azure AI Search, and a managed identity.
-- [ ] 2. Add a health check endpoint to `ContextSmith.Mcp`
+- [x] 2. Add a health check endpoint to `ContextSmith.Mcp`
       (`Microsoft.Extensions.Diagnostics.HealthChecks`, exposed over HTTP
       alongside the MCP transport).
 - [ ] 3. Deploy to a test resource group (`azd up` or
@@ -694,6 +698,16 @@ same application contracts as local development.
       0.
 - [ ] A scripted smoke test sends a request to the deployed health check
       endpoint and receives HTTP 200.
+
+**As built, and what stays open.** `ContextSmith.Mcp` serves `/mcp` and `/health` when
+`Mcp:Transport=Http`; stdio stays the default. The `Dockerfile` builds an image that
+answers `/health` with 200 (checked locally with Docker, and CI builds the image).
+`scripts/smoke-test.sh <url>` is the smoke test.
+
+Open, by decision: Bicep or `azd` for Azure Container Apps, Document Intelligence, Azure
+OpenAI, AI Search, and a managed identity. This needs an Azure subscription, and the
+project avoids tying the deployment to one cloud. Any container host can run the image
+today. If Azure is chosen later, the unchecked criteria below still apply.
 
 ### Step 10 — Evaluation
 
@@ -889,4 +903,4 @@ uploads or fetches a document (txt/md/docx/html/xlsx/pptx, PDF when Azure
 Document Intelligence is configured, or any http(s) URL), parses it into the
 canonical model, chunks it, embeds and indexes the chunks (Ollama or Azure
 OpenAI; in-memory, file, or Azure AI Search), and answers grounded questions
-through an Angular UI. Step 9 (deployment) remains.
+through an Angular UI. Step 9 (Azure deployment) is partly done: the container image and health check exist; the Azure infrastructure is left open.
