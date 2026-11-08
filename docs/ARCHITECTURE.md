@@ -230,30 +230,36 @@ implementation lives in one file. `ContextSmith.Application` defines both
 interfaces. `ContextSmith.Retrieval.Local` and `ContextSmith.Persistence.Local`
 hold the in-memory and file-backed implementations.
 
-A future SQLite or PostgreSQL implementation can use the same two
-interfaces. It does not need interface changes. A likely schema:
+`ContextSmith.Persistence.Postgres` is the first database implementation
+([#25](https://github.com/pkuppens/context-smith/issues/25)). It uses PostgreSQL
+with the `pgvector` extension, through Npgsql, with no ORM.
 
 ```text
-documents(id TEXT PRIMARY KEY, content TEXT, updated_at TIMESTAMP)
-chunks(id TEXT PRIMARY KEY, document_id TEXT, text TEXT, heading_path TEXT, source_id TEXT, location TEXT)
-embeddings(chunk_id TEXT PRIMARY KEY REFERENCES chunks(id), vector BLOB, dimension INTEGER)
+documents(id TEXT PRIMARY KEY, content JSONB, updated_at TIMESTAMPTZ)
+chunks(document_id TEXT, id TEXT, content JSONB, embedding VECTOR(n), PRIMARY KEY (document_id, id))
 ```
 
-SQLite has no native vector column. A first implementation can store the
-vector as a packed `BLOB` and score matches in application code, the same
-way `InMemoryRetrievalService` and `FileRetrievalService` do today.
-PostgreSQL can use the `pgvector` extension for a native vector column and
-index instead.
+- `PostgresDocumentStore` writes the document tree as JSON, the same
+  serialization as `FileDocumentStore`. `jsonb` does not keep key order, so the
+  read path sets `AllowOutOfOrderMetadataProperties` for the polymorphic
+  `$type` discriminator.
+- `PostgresRetrievalService` is per document, like `FileRetrievalService`. It
+  upserts on `(document_id, id)` and ranks with cosine distance (`<=>`).
+- The vector dimension (`Postgres:VectorDimension`, default 768 for
+  `nomic-embed-text`) fixes the column size when the table is first created.
+  Changing the embedding model later needs a new table or a migration.
+- Both classes create their tables on first use.
 
 Configuration selects the active backend at startup through `Storage:Provider`
-(`InMemory` or `File` today). Adding a database backend means adding one more
-case to this switch, not changing the interfaces or their callers.
+(`InMemory`, `File`, or `Postgres`). `Postgres` needs
+`Postgres:ConnectionString`. `Retrieval:Provider` follows `Storage:Provider`
+unless set, so `Storage:Provider=Postgres` also stores chunks and vectors in
+PostgreSQL. Supabase is PostgreSQL, so the same classes work there. MongoDB is
+not implemented.
 
-A database that supports vectors natively (PostgreSQL with `pgvector`,
-MongoDB, or Supabase) could implement both `IDocumentStore` and
-`IRetrievalService`, replacing the separate `Retrieval:Provider` axis with a
-single store for documents, chunks, and embeddings. This is tracked as
-future work in [#25](https://github.com/pkuppens/context-smith/issues/25).
+SQLite has no native vector column. An implementation for it could store the
+vector as a packed `BLOB` and score matches in application code, as
+`InMemoryRetrievalService` and `FileRetrievalService` do.
 
 ## Relationship with Azure
 

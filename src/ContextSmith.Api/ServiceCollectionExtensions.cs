@@ -6,6 +6,7 @@ using ContextSmith.Documents.Pdf;
 using ContextSmith.Documents.PowerPoint;
 using ContextSmith.Documents.Text;
 using ContextSmith.Persistence.Local;
+using ContextSmith.Persistence.Postgres;
 using ContextSmith.Retrieval.Azure;
 using ContextSmith.Retrieval.Local;
 
@@ -27,6 +28,9 @@ public static class ServiceCollectionExtensions
         {
             "InMemory" => new InMemoryDocumentStore(),
             "File" => new FileDocumentStore(storageDirectory),
+            "Postgres" => new PostgresDocumentStore(
+                configuration["Postgres:ConnectionString"]
+                    ?? throw new InvalidOperationException("Postgres:ConnectionString is required when Storage:Provider is 'Postgres'.")),
             var other => throw new NotSupportedException($"Unknown Storage:Provider '{other}'."),
         });
 
@@ -96,6 +100,11 @@ public static class ServiceCollectionExtensions
         {
             "InMemory" => documentId => new InMemoryRetrievalService(),
             "File" => documentId => new FileRetrievalService(storageDirectory, documentId),
+            "Postgres" => documentId => new PostgresRetrievalService(
+                configuration["Postgres:ConnectionString"]
+                    ?? throw new InvalidOperationException("Postgres:ConnectionString is required when Retrieval:Provider is 'Postgres'."),
+                documentId,
+                int.TryParse(configuration["Postgres:VectorDimension"], out var postgresDimension) ? postgresDimension : 768),
             "AzureSearch" => documentId => new AzureAiSearchRetrievalService(
                 new Uri(configuration["AzureSearch:Endpoint"]
                     ?? throw new InvalidOperationException("AzureSearch:Endpoint is required when Retrieval:Provider is 'AzureSearch'.")),

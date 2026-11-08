@@ -137,3 +137,15 @@ dotnet run --project src/ContextSmith.Evaluation -- samples/documents/evaluation
 ```
 
 It prints a table and writes a CSV with Recall@K, MRR, and nDCG@K per strategy. See `docs/PLAN.md` (Step 10) for how judgments work.
+
+## PostgreSQL storage
+
+Set `Storage:Provider=Postgres` and `Postgres:ConnectionString` to keep documents, chunks, and embeddings in PostgreSQL with `pgvector`.
+
+```bash
+docker run -d --name pgvector -e POSTGRES_PASSWORD=test -e POSTGRES_DB=contextsmith -p 54329:5432 pgvector/pgvector:pg17
+export CONTEXTSMITH_POSTGRES="Host=localhost;Port=54329;Username=postgres;Password=test;Database=contextsmith"
+dotnet test tests/ContextSmith.Persistence.Postgres.Tests   # integration tests run when the variable is set
+```
+
+`Postgres:VectorDimension` (default 768) must match the embedding model. See `docs/ARCHITECTURE.md`, Persistence.

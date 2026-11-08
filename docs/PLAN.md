@@ -870,11 +870,21 @@ finished persistence shape instead of retrofitting it.
 
 See the issue for full acceptance criteria, steps, and validation.
 
+### Step 16 — PostgreSQL store with pgvector
+
+Issue: [#25](https://github.com/pkuppens/context-smith/issues/25)
+
+**Status: done.** `ContextSmith.Persistence.Postgres` adds `PostgresDocumentStore` and
+`PostgresRetrievalService`, selected by `Storage:Provider=Postgres`. Unit tests cover
+the SQL helpers and provider selection. Integration tests run against a `pgvector`
+container when `CONTEXTSMITH_POSTGRES` is set, and in CI through a service container.
+See `docs/ARCHITECTURE.md`, Persistence.
+
 ## Status
 
 ContextSmith is under active development.
 
-Steps 1-8 and 10-15 are done: a working local demo (`docs/DEMO.md`) that
+Steps 1-8 and 10-16 are done: a working local demo (`docs/DEMO.md`) that
 uploads or fetches a document (txt/md/docx/html/xlsx/pptx, PDF when Azure
 Document Intelligence is configured, or any http(s) URL), parses it into the
 canonical model, chunks it, embeds and indexes the chunks (Ollama or Azure

@@ -6,6 +6,7 @@ using ContextSmith.Documents.Pdf;
 using ContextSmith.Documents.PowerPoint;
 using ContextSmith.Documents.Text;
 using ContextSmith.Persistence.Local;
+using ContextSmith.Persistence.Postgres;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,6 +28,9 @@ public static class ServiceCollectionExtensions
         {
             "InMemory" => new InMemoryDocumentStore(),
             "File" => new FileDocumentStore(storageDirectory),
+            "Postgres" => new PostgresDocumentStore(
+                configuration["Postgres:ConnectionString"]
+                    ?? throw new InvalidOperationException("Postgres:ConnectionString is required when Storage:Provider is 'Postgres'.")),
             var other => throw new NotSupportedException($"Unknown Storage:Provider '{other}'."),
         });
 
