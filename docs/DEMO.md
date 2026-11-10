@@ -54,7 +54,7 @@ Ollama) before starting.
 
 5. Upload a document — either:
    - **Choose file**, and pick one of `samples/documents/sample.txt`,
-     `sample.md`, `sample.docx`, or `sample.html`; or
+     `sample.md`, `sample.docx`, `sample.html`, `sample.xlsx`, or `sample.pptx`; or
    - paste a URL (any public `http(s)` page) into the URL field and click
      **Fetch**.
 

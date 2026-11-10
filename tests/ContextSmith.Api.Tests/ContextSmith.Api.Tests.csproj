@@ -18,6 +18,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\ContextSmith.Api\ContextSmith.Api.csproj" />
     <ProjectReference Include="..\..\src\ContextSmith.Documents.Pdf\ContextSmith.Documents.Pdf.csproj" />
+    <ProjectReference Include="..\..\src\ContextSmith.Documents.Excel\ContextSmith.Documents.Excel.csproj" />
+    <ProjectReference Include="..\..\src\ContextSmith.Documents.PowerPoint\ContextSmith.Documents.PowerPoint.csproj" />
   </ItemGroup>
 
 </Project>

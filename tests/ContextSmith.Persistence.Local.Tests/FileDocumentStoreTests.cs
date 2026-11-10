@@ -38,6 +38,26 @@ public class FileDocumentStoreTests
         Assert.Equal("Leave Policy", section.Title);
     }
 
+    [Fact]
+    public void Get_reloads_a_table_written_by_a_different_instance()
+    {
+        // Regression: TableBlock was missing from DocumentNode's polymorphic JSON types,
+        // so any document with a table (HTML, PDF, Excel, PowerPoint) failed to save.
+        var directory = CreateTempDirectory();
+        var document = new Document
+        {
+            Metadata = new DocumentMetadata(),
+            Provenance = new Provenance("plans.html"),
+            Children = [new TableBlock { Rows = [["Plan", "Cost"], ["Dental", "10"]], Provenance = new Provenance("plans.html", "table-1") }],
+        };
+
+        new FileDocumentStore(directory).Store(document, "plans");
+        var reloaded = new FileDocumentStore(directory).Get("plans");
+
+        var table = Assert.IsType<TableBlock>(Assert.Single(reloaded!.Children));
+        Assert.Equal(["Dental", "10"], table.Rows[1]);
+    }
+
     private static string CreateTempDirectory()
     {
         var directory = Path.Combine(Path.GetTempPath(), "context-smith-tests", Guid.NewGuid().ToString("n"));

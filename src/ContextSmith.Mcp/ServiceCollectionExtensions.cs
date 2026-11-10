@@ -1,7 +1,9 @@
 using ContextSmith.Application;
 using ContextSmith.Documents.Docx;
+using ContextSmith.Documents.Excel;
 using ContextSmith.Documents.Html;
 using ContextSmith.Documents.Pdf;
+using ContextSmith.Documents.PowerPoint;
 using ContextSmith.Documents.Text;
 using ContextSmith.Persistence.Local;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +41,8 @@ public static class ServiceCollectionExtensions
                 ["docx"] = new DocxDocumentParser(),
                 ["html"] = new HtmlDocumentParser(),
                 ["htm"] = new HtmlDocumentParser(),
+                ["xlsx"] = new ExcelDocumentParser(),
+                ["pptx"] = new PowerPointDocumentParser(),
             };
 
             // PDF parsing needs an Azure Document Intelligence resource, so it is opt-in by configuration.
