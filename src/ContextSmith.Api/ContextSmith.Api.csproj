@@ -15,6 +15,7 @@
     <ProjectReference Include="..\ContextSmith.Documents.Pdf\ContextSmith.Documents.Pdf.csproj" />
     <ProjectReference Include="..\ContextSmith.Documents.Excel\ContextSmith.Documents.Excel.csproj" />
     <ProjectReference Include="..\ContextSmith.Documents.PowerPoint\ContextSmith.Documents.PowerPoint.csproj" />
+    <ProjectReference Include="..\ContextSmith.Persistence.Postgres\ContextSmith.Persistence.Postgres.csproj" />
   </ItemGroup>
 
 </Project>

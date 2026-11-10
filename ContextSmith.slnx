@@ -12,6 +12,7 @@
     <Project Path="src/ContextSmith.Evaluation/ContextSmith.Evaluation.csproj" />
     <Project Path="src/ContextSmith.Mcp/ContextSmith.Mcp.csproj" />
     <Project Path="src/ContextSmith.Persistence.Local/ContextSmith.Persistence.Local.csproj" />
+    <Project Path="src/ContextSmith.Persistence.Postgres/ContextSmith.Persistence.Postgres.csproj" />
     <Project Path="src/ContextSmith.Retrieval.Azure/ContextSmith.Retrieval.Azure.csproj" />
     <Project Path="src/ContextSmith.Retrieval.Local/ContextSmith.Retrieval.Local.csproj" />
   </Folder>
@@ -28,6 +29,7 @@
     <Project Path="tests/ContextSmith.Evaluation.Tests/ContextSmith.Evaluation.Tests.csproj" />
     <Project Path="tests/ContextSmith.Mcp.Tests/ContextSmith.Mcp.Tests.csproj" />
     <Project Path="tests/ContextSmith.Persistence.Local.Tests/ContextSmith.Persistence.Local.Tests.csproj" />
+    <Project Path="tests/ContextSmith.Persistence.Postgres.Tests/ContextSmith.Persistence.Postgres.Tests.csproj" />
     <Project Path="tests/ContextSmith.Retrieval.Azure.Tests/ContextSmith.Retrieval.Azure.Tests.csproj" />
     <Project Path="tests/ContextSmith.Retrieval.Local.Tests/ContextSmith.Retrieval.Local.Tests.csproj" />
   </Folder>
