@@ -127,3 +127,13 @@ traceable and measurable AI context
 ## Status
 
 ContextSmith is under active development. See [docs/PLAN.md](docs/PLAN.md) for details.
+
+## Evaluation
+
+Compare chunking strategies on a judged query set. The run is offline and repeatable.
+
+```bash
+dotnet run --project src/ContextSmith.Evaluation -- samples/documents/evaluation evaluation-report.csv 3
+```
+
+It prints a table and writes a CSV with Recall@K, MRR, and nDCG@K per strategy. See `docs/PLAN.md` (Step 10) for how judgments work.

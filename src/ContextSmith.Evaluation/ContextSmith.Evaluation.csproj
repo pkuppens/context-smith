@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ContextSmith.Application\ContextSmith.Application.csproj" />
+    <ProjectReference Include="..\ContextSmith.Documents.Text\ContextSmith.Documents.Text.csproj" />
+    <ProjectReference Include="..\ContextSmith.Retrieval.Local\ContextSmith.Retrieval.Local.csproj" />
+  </ItemGroup>
+
+</Project>
