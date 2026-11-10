@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ContextSmith.Api\ContextSmith.Api.csproj" />
+    <ProjectReference Include="..\..\src\ContextSmith.Documents.Pdf\ContextSmith.Documents.Pdf.csproj" />
   </ItemGroup>
 
 </Project>

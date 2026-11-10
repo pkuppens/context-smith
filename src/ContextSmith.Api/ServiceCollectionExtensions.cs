@@ -1,6 +1,7 @@
 using ContextSmith.Application;
 using ContextSmith.Documents.Docx;
 using ContextSmith.Documents.Html;
+using ContextSmith.Documents.Pdf;
 using ContextSmith.Documents.Text;
 using ContextSmith.Persistence.Local;
 using ContextSmith.Retrieval.Azure;
@@ -39,6 +40,15 @@ public static class ServiceCollectionExtensions
                 ["html"] = new HtmlDocumentParser(),
                 ["htm"] = new HtmlDocumentParser(),
             };
+
+            // PDF parsing needs an Azure Document Intelligence resource, so it is opt-in by configuration.
+            var documentIntelligenceEndpoint = configuration["DocumentIntelligence:Endpoint"];
+            if (!string.IsNullOrWhiteSpace(documentIntelligenceEndpoint))
+            {
+                parsersByExtension["pdf"] = new PdfDocumentParser(new AzureDocumentIntelligenceGateway(
+                    new Uri(documentIntelligenceEndpoint),
+                    configuration["DocumentIntelligence:ApiKey"]));
+            }
 
             return new ExtensionDocumentParserSelector(parsersByExtension);
         });

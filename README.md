@@ -63,7 +63,7 @@ The first document phase includes these formats.
 | Markdown | `.md` | Use Markdown structure as explicit source structure. |
 | Word | `.docx` | Read source structure with Open XML and optional managed services. |
 | HTML | `.html`, `.htm`, or a fetched `http(s)` URL | Parse HTML structure (headings, lists, tables). A URL is fetched over HTTP(S) — no other scheme is accepted — then parsed the same way as an uploaded HTML file. |
-| PDF | `.pdf` | Read text and layout with a PDF parser or a managed document service. |
+| PDF | `.pdf` | Read text and layout with Azure Document Intelligence (`prebuilt-layout`). Enabled when `DocumentIntelligence:Endpoint` is set; `DocumentIntelligence:ApiKey` is optional, and managed identity is used without it. |
 
 Later phases can add these formats.
 
